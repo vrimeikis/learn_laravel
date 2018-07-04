@@ -19,7 +19,7 @@ class CreateArticlesTable extends Migration
             $table->increments('id');
             $table->timestamps();
             $table->string('title', 255);
-            $table->text('decsription');
+            $table->text('description');
             $table->string('author', 100);
             $table->string('slug', 255)->unique();
         });

@@ -26,6 +26,14 @@
                                 <th>Actions</th>
                             </tr>
 
+                            @foreach($articles as $article)
+                                <tr>
+                                    <td>{{ $article->id }}</td>
+                                    <td>{{ $article->title }}</td>
+                                    <td>{{ $article->slug }}</td>
+                                    <td></td>
+                                </tr>
+                            @endforeach
 
                         </table>
 
