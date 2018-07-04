@@ -31,7 +31,15 @@
                                     <td>{{ $article->id }}</td>
                                     <td>{{ $article->title }}</td>
                                     <td>{{ $article->slug }}</td>
-                                    <td></td>
+                                    <td>
+                                        <a class="btn btn-sm btn-info" href="{{ route('article.show', [$article->id]) }}">{{ __('View') }}</a>
+                                        <a class="btn btn-sm btn-success" href="{{ route('article.edit', [$article->id]) }}">{{ __('Edit') }}</a>
+                                        <form action="{{ route('article.destroy', [$article->id]) }}" method="post">
+                                            {{ csrf_field() }}
+                                            {{ method_field('delete') }}
+                                            <input class="btn btn-sm btn-danger" type="submit" value="Delete">
+                                        </form>
+                                    </td>
                                 </tr>
                             @endforeach
 

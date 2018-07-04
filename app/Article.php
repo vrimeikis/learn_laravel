@@ -14,12 +14,12 @@ use Illuminate\Database\Eloquent\Model;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property string $title
- * @property string $decsription
+ * @property string $description
  * @property string $author
  * @property string $slug
  * @method static Builder|Article whereAuthor($value)
  * @method static Builder|Article whereCreatedAt($value)
- * @method static Builder|Article whereDecsription($value)
+ * @method static Builder|Article whereDescription($value)
  * @method static Builder|Article whereId($value)
  * @method static Builder|Article whereSlug($value)
  * @method static Builder|Article whereTitle($value)

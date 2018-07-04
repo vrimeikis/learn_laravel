@@ -67,7 +67,7 @@ class ArticleController extends Controller
      */
     public function show(Article $article)
     {
-        //
+        return view('article.view', compact('article'));
     }
 
     /**
@@ -78,7 +78,7 @@ class ArticleController extends Controller
      */
     public function edit(Article $article)
     {
-        //
+        return view('article.edit', compact('article'));
     }
 
     /**
@@ -90,7 +90,16 @@ class ArticleController extends Controller
      */
     public function update(Request $request, Article $article)
     {
-        //
+        $article->title = $request->title;
+        $article->description = $request->description;
+        $article->author = $request->author;
+        $article->slug = (empty($request->slug)) ? Str::slug($request->title) : $request->slug;
+
+        $article->save();
+
+        return redirect()
+            ->route('article.index')
+            ->with('status', 'Updated successfully!');
     }
 
     /**
@@ -101,6 +110,10 @@ class ArticleController extends Controller
      */
     public function destroy(Article $article)
     {
-        //
+        $article->delete();
+
+        return redirect()
+            ->route('article.index')
+            ->with('status', 'Article delete successfully!');
     }
 }
