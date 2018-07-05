@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace App\Http\Controllers;
 
 use App\Article;
+use App\Http\Requests\ArticleStoreRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -40,16 +41,16 @@ class ArticleController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request $request
+     * @param ArticleStoreRequest $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(ArticleStoreRequest $request)
     {
         $data = [
-            'title' => $request->title,
-            'description' => $request->description,
-            'author' => $request->author,
-            'slug' => Str::slug($request->title),
+            'title' => $request->getTitle(),
+            'description' => $request->getDescription(),
+            'author' => $request->getAuthor(),
+            'slug' => $request->getSlug(),
         ];
 
         Article::create($data);
