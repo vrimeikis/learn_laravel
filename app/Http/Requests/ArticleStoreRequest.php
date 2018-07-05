@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Article;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
 
@@ -29,6 +31,33 @@ class ArticleStoreRequest extends FormRequest
             'description' => 'required',
             'author' => 'required|min:2|max:100|string',
         ];
+    }
+
+
+    protected function getValidatorInstance()
+    {
+        $validator = parent::getValidatorInstance();
+        $validator->after(function (Validator $validator) {
+            if ($this->slugExists()) {
+                $validator
+                    ->errors()
+                    ->add('title', 'Slug by name exists on DB');
+                return;
+            }
+        });
+
+        return $validator;
+    }
+
+    private function slugExists()
+    {
+        $slug = Article::whereSlug($this->getSlug())->get();
+
+        if (!empty($slug->toArray())) {
+            return true;
+        }
+
+        return false;
     }
 
     public function getTitle()
