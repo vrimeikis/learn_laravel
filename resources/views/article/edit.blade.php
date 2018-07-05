@@ -17,37 +17,53 @@
                             </div>
                         @endif
 
-                       <form action="{{ route('article.update', [$article->id]) }}" method="post">
+                        <form action="{{ route('article.update', [$article->id]) }}" method="post">
 
-                           {{ method_field('put') }}
+                            {{ method_field('put') }}
 
-                           {{ csrf_field() }}
+                            {{ csrf_field() }}
 
-                           <div class="form-group">
-                               <label for="title">{{ __('Title') }}:</label>
-                               <input id="title" class="form-control" type="text" name="title" value="{{ $article->title }}">
-                           </div>
+                            <div class="form-group">
+                                <label for="title">{{ __('Title') }}:</label>
+                                <input id="title" class="form-control" type="text" name="title"
+                                       value="{{ old('title', $article->title) }}">
+                                @if($errors->has('title'))
+                                    <div class="alert-danger">{{ $errors->first('title') }}</div>
+                                @endif
+                            </div>
 
-                           <div class="form-group">
-                               <label for="description">{{ __('Description') }}:</label>
-                               <textarea id="description" class="form-control" name="description">{{ $article->description }}</textarea>
-                           </div>
+                            <div class="form-group">
+                                <label for="description">{{ __('Description') }}:</label>
+                                <textarea id="description" class="form-control"
+                                          name="description">{{ old('description', $article->description) }}</textarea>
+                                @if($errors->has('description'))
+                                    <div class="alert-danger">{{ $errors->first('description') }}</div>
+                                @endif
+                            </div>
 
-                           <div class="form-group">
-                               <label for="author">{{ __('Author') }}:</label>
-                               <input id="author" class="form-control" type="text" name="author" value="{{ $article->author }}">
-                           </div>
+                            <div class="form-group">
+                                <label for="author">{{ __('Author') }}:</label>
+                                <input id="author" class="form-control" type="text" name="author"
+                                       value="{{ old('author', $article->author) }}">
+                                @if($errors->has('author'))
+                                    <div class="alert-danger">{{ $errors->first('author') }}</div>
+                                @endif
+                            </div>
 
-                           <div class="form-group">
-                               <label for="slug">{{ __('Slug') }}:</label>
-                               <input id="slug" class="form-control" type="text" name="slug" value="{{ $article->slug }}">
-                           </div>
+                            <div class="form-group">
+                                <label for="slug">{{ __('Slug') }}:</label>
+                                <input id="slug" class="form-control" type="text" name="slug"
+                                       value="{{ old('slug', $article->slug) }}">
+                                @if($errors->has('slug'))
+                                    <div class="alert-danger">{{ $errors->first('slug') }}</div>
+                                @endif
+                            </div>
 
-                           <div class="form-group">
-                               <input class="btn btn-success" type="submit" value="{{ __('Save') }}">
-                           </div>
+                            <div class="form-group">
+                                <input class="btn btn-success" type="submit" value="{{ __('Save') }}">
+                            </div>
 
-                       </form>
+                        </form>
 
                     </div>
                 </div>

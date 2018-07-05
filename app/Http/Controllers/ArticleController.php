@@ -6,8 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Article;
 use App\Http\Requests\ArticleStoreRequest;
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
+use App\Http\Requests\ArticleUpdateRequest;
 
 class ArticleController extends Controller
 {
@@ -89,12 +88,12 @@ class ArticleController extends Controller
      * @param  \App\Article $article
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Article $article)
+    public function update(ArticleUpdateRequest $request, Article $article)
     {
-        $article->title = $request->title;
-        $article->description = $request->description;
-        $article->author = $request->author;
-        $article->slug = (empty($request->slug)) ? Str::slug($request->title) : $request->slug;
+        $article->title = $request->getTitle();
+        $article->description = $request->getDescription();
+        $article->author = $request->getAuthor();
+        $article->slug = $request->getSlug();
 
         $article->save();
 

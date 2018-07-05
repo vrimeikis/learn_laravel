@@ -2,12 +2,12 @@
 
 namespace App\Http\Requests;
 
+
 use App\Article;
 use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
 
-class ArticleStoreRequest extends FormRequest
+class ArticleUpdateRequest extends ArticleStoreRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,22 +26,15 @@ class ArticleStoreRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            'title' => 'required|min:3|max:191|string',
-            'description' => 'required',
-            'author' => 'required|min:2|max:100|string',
-        ];
+        return parent::rules();
     }
-
 
     protected function getValidatorInstance()
     {
         $validator = parent::getValidatorInstance();
         $validator->after(function (Validator $validator) {
-            if ($this->isMethod('post') && $this->slugExists()) {
-                $validator
-                    ->errors()
-                    ->add('title', 'Slug by name exists on DB');
+            if ($this->isMethod('put') && $this->slugExists()) {
+                $validator->errors()->add('slug', 'Slug already exists.');
                 return;
             }
         });
@@ -51,7 +44,13 @@ class ArticleStoreRequest extends FormRequest
 
     protected function slugExists()
     {
-        $slug = Article::whereSlug($this->getSlug())->get();
+        $slug = Article::whereSlug($this->getSlug())
+            ->where(
+                'id',
+                '!=',
+                $this->route()->parameter('article')->id
+            )
+            ->get();
 
         if (!empty($slug->toArray())) {
             return true;
@@ -60,23 +59,8 @@ class ArticleStoreRequest extends FormRequest
         return false;
     }
 
-    public function getTitle()
-    {
-        return $this->input('title');
-    }
-
-    public function getDescription()
-    {
-        return $this->input('description');
-    }
-
-    public function getAuthor()
-    {
-        return $this->input('author');
-    }
-
     public function getSlug()
     {
-        return Str::slug($this->getTitle());
+        return Str::slug($this->input('slug') ? $this->input('slug') : $this->getTitle());
     }
 }
