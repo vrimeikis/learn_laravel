@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace App\Http\Requests;
 
 use App\Article;
@@ -7,6 +9,10 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
 
+/**
+ * Class ArticleStoreRequest
+ * @package App\Http\Requests
+ */
 class ArticleStoreRequest extends FormRequest
 {
     /**
@@ -14,7 +20,7 @@ class ArticleStoreRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
@@ -24,7 +30,7 @@ class ArticleStoreRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'title' => 'required|min:3|max:191|string',
@@ -33,8 +39,26 @@ class ArticleStoreRequest extends FormRequest
         ];
     }
 
+    /**
+     * @return string
+     */
+    public function getDescription(): string
+    {
+        return $this->input('description');
+    }
 
-    protected function getValidatorInstance()
+    /**
+     * @return string
+     */
+    public function getAuthor(): string
+    {
+        return $this->input('author');
+    }
+
+    /**
+     * @return Validator
+     */
+    protected function getValidatorInstance(): Validator
     {
         $validator = parent::getValidatorInstance();
         $validator->after(function (Validator $validator) {
@@ -42,6 +66,7 @@ class ArticleStoreRequest extends FormRequest
                 $validator
                     ->errors()
                     ->add('title', 'Slug by name exists on DB');
+
                 return;
             }
         });
@@ -49,9 +74,18 @@ class ArticleStoreRequest extends FormRequest
         return $validator;
     }
 
-    protected function slugExists()
+    /**
+     * @return bool
+     */
+    protected function slugExists(): bool
     {
-        $slug = Article::whereSlug($this->getSlug())->get();
+        $title = $this->getTitle();
+
+        if(!$title) {
+            return true;
+        }
+
+        $slug = Article::whereSlug($title)->get();
 
         if (!empty($slug->toArray())) {
             return true;
@@ -60,23 +94,19 @@ class ArticleStoreRequest extends FormRequest
         return false;
     }
 
-    public function getTitle()
-    {
-        return $this->input('title');
-    }
-
-    public function getDescription()
-    {
-        return $this->input('description');
-    }
-
-    public function getAuthor()
-    {
-        return $this->input('author');
-    }
-
-    public function getSlug()
+    /**
+     * @return string
+     */
+    public function getSlug(): string
     {
         return Str::slug($this->getTitle());
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getTitle(): ? string
+    {
+        return $this->input('title');
     }
 }

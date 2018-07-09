@@ -1,12 +1,17 @@
 <?php
 
-namespace App\Http\Requests;
+declare(strict_types = 1);
 
+namespace App\Http\Requests;
 
 use App\Article;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Support\Str;
 
+/**
+ * Class ArticleUpdateRequest
+ * @package App\Http\Requests
+ */
 class ArticleUpdateRequest extends ArticleStoreRequest
 {
     /**
@@ -14,7 +19,7 @@ class ArticleUpdateRequest extends ArticleStoreRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
@@ -24,17 +29,23 @@ class ArticleUpdateRequest extends ArticleStoreRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return parent::rules();
     }
 
-    protected function getValidatorInstance()
+    /**
+     * Validate slug in DB on update request
+     *
+     * @return Validator
+     */
+    protected function getValidatorInstance(): Validator
     {
         $validator = parent::getValidatorInstance();
         $validator->after(function (Validator $validator) {
             if ($this->isMethod('put') && $this->slugExists()) {
                 $validator->errors()->add('slug', 'Slug already exists.');
+
                 return;
             }
         });
@@ -42,7 +53,10 @@ class ArticleUpdateRequest extends ArticleStoreRequest
         return $validator;
     }
 
-    protected function slugExists()
+    /**
+     * @return bool
+     */
+    protected function slugExists(): bool
     {
         $slug = Article::whereSlug($this->getSlug())
             ->where(
@@ -59,8 +73,11 @@ class ArticleUpdateRequest extends ArticleStoreRequest
         return false;
     }
 
-    public function getSlug()
+    /**
+     * @return string
+     */
+    public function getSlug(): string
     {
-        return Str::slug($this->input('slug') ? $this->input('slug') : $this->getTitle());
+        return Str::slug($this->input('slug') ?: $this->getTitle());
     }
 }

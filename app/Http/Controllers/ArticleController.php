@@ -7,6 +7,8 @@ namespace App\Http\Controllers;
 use App\Article;
 use App\Http\Requests\ArticleStoreRequest;
 use App\Http\Requests\ArticleUpdateRequest;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class ArticleController extends Controller
 {
@@ -18,9 +20,9 @@ class ArticleController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return View
      */
-    public function index()
+    public function index(): View
     {
         $articles = Article::all();
 
@@ -30,9 +32,9 @@ class ArticleController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return View
      */
-    public function create()
+    public function create(): View
     {
         return view('article.create');
     }
@@ -41,9 +43,9 @@ class ArticleController extends Controller
      * Store a newly created resource in storage.
      *
      * @param ArticleStoreRequest $request
-     * @return \Illuminate\Http\Response
+     * @return RedirectResponse
      */
-    public function store(ArticleStoreRequest $request)
+    public function store(ArticleStoreRequest $request): RedirectResponse
     {
         $data = [
             'title' => $request->getTitle(),
@@ -63,9 +65,9 @@ class ArticleController extends Controller
      * Display the specified resource.
      *
      * @param  \App\Article $article
-     * @return \Illuminate\Http\Response
+     * @return View
      */
-    public function show(Article $article)
+    public function show(Article $article): View
     {
         return view('article.view', compact('article'));
     }
@@ -74,9 +76,9 @@ class ArticleController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param  \App\Article $article
-     * @return \Illuminate\Http\Response
+     * @return View
      */
-    public function edit(Article $article)
+    public function edit(Article $article): View
     {
         return view('article.edit', compact('article'));
     }
@@ -84,11 +86,11 @@ class ArticleController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request $request
+     * @param ArticleUpdateRequest $request
      * @param  \App\Article $article
-     * @return \Illuminate\Http\Response
+     * @return RedirectResponse
      */
-    public function update(ArticleUpdateRequest $request, Article $article)
+    public function update(ArticleUpdateRequest $request, Article $article): RedirectResponse
     {
         $article->title = $request->getTitle();
         $article->description = $request->getDescription();
@@ -106,9 +108,10 @@ class ArticleController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  \App\Article $article
-     * @return \Illuminate\Http\Response
+     * @return RedirectResponse
+     * @throws \Exception
      */
-    public function destroy(Article $article)
+    public function destroy(Article $article): RedirectResponse
     {
         $article->delete();
 

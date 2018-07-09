@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace App;
 
 use Carbon\Carbon;
@@ -27,6 +29,9 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Article extends Model
 {
+    /**
+     * @var array
+     */
     protected $fillable = [
         'title',
         'description',
