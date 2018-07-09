@@ -30,9 +30,11 @@ class AddForeignKeyToArticlesTable extends Migration
     public function down()
     {
         Schema::disableForeignKeyConstraints();
+
         Schema::table('articles', function (Blueprint $table) {
             $table->dropForeign('articles_author_id_foreign');
         });
+
         Schema::enableForeignKeyConstraints();
     }
 }
