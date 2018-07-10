@@ -5,8 +5,8 @@ declare(strict_types = 1);
 namespace App\Http\Controllers;
 
 use App\Author;
+use App\Http\Requests\AuthorRequest;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 /**
@@ -40,14 +40,14 @@ class AuthorController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request $request
+     * @param AuthorRequest $request
      * @return RedirectResponse
      */
-    public function store(Request $request): RedirectResponse
+    public function store(AuthorRequest $request): RedirectResponse
     {
         Author::create([
-            'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
+            'first_name' => $request->getFirstName(),
+            'last_name' => $request->getLastName(),
         ]);
 
         return redirect()
@@ -69,14 +69,14 @@ class AuthorController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request $request
+     * @param AuthorRequest $request
      * @param  \App\Author $author
      * @return RedirectResponse
      */
-    public function update(Request $request, Author $author): RedirectResponse
+    public function update(AuthorRequest $request, Author $author): RedirectResponse
     {
-        $author->first_name = $request->first_name;
-        $author->last_name = $request->last_name;
+        $author->first_name = $request->getFirstName();
+        $author->last_name = $request->getLastName();
         $author->save();
 
         return redirect()
