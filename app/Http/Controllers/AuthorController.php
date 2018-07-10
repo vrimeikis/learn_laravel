@@ -5,9 +5,14 @@ declare(strict_types = 1);
 namespace App\Http\Controllers;
 
 use App\Author;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
+/**
+ * Class AuthorController
+ * @package App\Http\Controllers
+ */
 class AuthorController extends Controller
 {
     /**
@@ -25,7 +30,7 @@ class AuthorController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return View
      */
     public function create(): View
     {
@@ -36,9 +41,9 @@ class AuthorController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @return RedirectResponse
      */
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
         Author::create([
             'first_name' => $request->first_name,
@@ -51,25 +56,14 @@ class AuthorController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  \App\Author $author
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Author $author)
-    {
-        //
-    }
-
-    /**
      * Show the form for editing the specified resource.
      *
      * @param  \App\Author $author
-     * @return \Illuminate\Http\Response
+     * @return View
      */
-    public function edit(Author $author)
+    public function edit(Author $author): View
     {
-        //
+        return view('author.edit', compact('author'));
     }
 
     /**
@@ -77,21 +71,17 @@ class AuthorController extends Controller
      *
      * @param  \Illuminate\Http\Request $request
      * @param  \App\Author $author
-     * @return \Illuminate\Http\Response
+     * @return RedirectResponse
      */
-    public function update(Request $request, Author $author)
+    public function update(Request $request, Author $author): RedirectResponse
     {
-        //
+        $author->first_name = $request->first_name;
+        $author->last_name = $request->last_name;
+        $author->save();
+
+        return redirect()
+            ->route('author.index')
+            ->with('status', 'Author update successfully!');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Author $author
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Author $author)
-    {
-        //
-    }
 }
