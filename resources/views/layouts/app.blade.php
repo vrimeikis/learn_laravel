@@ -49,6 +49,9 @@
                             </li>
                         @else
                             <li class="nav-item">
+                                <a class="nav-link" href="{{ route('author.index') }}">{{ __('Authors') }}</a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link" href="{{ route('article.index') }}">{{ __('Articles') }}</a>
                             </li>
                             <li class="nav-item dropdown">

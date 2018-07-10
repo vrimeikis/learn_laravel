@@ -7,25 +7,28 @@ namespace App;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
 
 /**
  * App\Article
  *
- * @mixin \Eloquent
  * @property int $id
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property string $title
  * @property string $description
- * @property string $author
  * @property string $slug
- * @method static Builder|Article whereAuthor($value)
+ * @property int|null $author_id
+ * @property-read Author|null $authors
+ * @method static Builder|Article whereAuthorId($value)
  * @method static Builder|Article whereCreatedAt($value)
  * @method static Builder|Article whereDescription($value)
  * @method static Builder|Article whereId($value)
  * @method static Builder|Article whereSlug($value)
  * @method static Builder|Article whereTitle($value)
  * @method static Builder|Article whereUpdatedAt($value)
+ * @mixin \Eloquent
  */
 class Article extends Model
 {
@@ -35,7 +38,16 @@ class Article extends Model
     protected $fillable = [
         'title',
         'description',
-        'author',
         'slug',
+        'author_id'
     ];
+
+
+    /**
+     * @return BelongsTo
+     */
+    public function authors(): BelongsTo
+    {
+        return $this->belongsTo(Author::class, 'author_id', 'id');
+    }
 }
