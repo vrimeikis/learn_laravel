@@ -27,9 +27,9 @@ class AuthorController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(): View
     {
-        //
+        return view('author.create');
     }
 
     /**
@@ -40,7 +40,14 @@ class AuthorController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        Author::create([
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
+        ]);
+
+        return redirect()
+            ->route('author.index')
+            ->with('status', 'Author created successfully!');
     }
 
     /**
