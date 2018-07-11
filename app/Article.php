@@ -20,7 +20,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $description
  * @property string $slug
  * @property int|null $author_id
- * @property-read Author|null $authors
+ * @property-read Author|null $author
  * @method static Builder|Article whereAuthorId($value)
  * @method static Builder|Article whereCreatedAt($value)
  * @method static Builder|Article whereDescription($value)
@@ -46,7 +46,7 @@ class Article extends Model
     /**
      * @return BelongsTo
      */
-    public function authors(): BelongsTo
+    public function author(): BelongsTo
     {
         return $this->belongsTo(Author::class, 'author_id', 'id');
     }

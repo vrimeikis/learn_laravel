@@ -35,7 +35,7 @@ class ArticleStoreRequest extends FormRequest
         return [
             'title' => 'required|min:3|max:191|string',
             'description' => 'required',
-            'author' => 'required|min:2|max:100|string',
+            'author_id' => 'required|exists:authors,id',
         ];
     }
 
@@ -50,9 +50,9 @@ class ArticleStoreRequest extends FormRequest
     /**
      * @return string
      */
-    public function getAuthor(): string
+    public function getAuthorId(): int
     {
-        return $this->input('author');
+        return (int)$this->input('author_id');
     }
 
     /**

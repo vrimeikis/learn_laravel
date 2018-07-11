@@ -28,7 +28,7 @@
                             </tr>
                             <tr>
                                 <td>{{ __('Author') }}:</td>
-                                <td>{{ $article->author }}</td>
+                                <td>{{ $article->author->first_name }} {{ $article->author->last_name }}</td>
                             </tr>
                             <tr>
                                 <td>{{ __('Slug') }}:</td>

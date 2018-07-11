@@ -18,10 +18,10 @@ class CreateArticlesTable extends Migration
         Schema::create('articles', function (Blueprint $table) {
             $table->increments('id');
             $table->timestamps();
-            $table->string('title', 255);
+            $table->string('title', 191);
             $table->text('description');
             $table->string('author', 100);
-            $table->string('slug', 255)->unique();
+            $table->string('slug', 191)->unique();
         });
     }
 

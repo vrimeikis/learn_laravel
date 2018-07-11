@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace App\Http\Controllers;
 
 use App\Article;
+use App\Author;
 use App\Http\Requests\ArticleStoreRequest;
 use App\Http\Requests\ArticleUpdateRequest;
 use Illuminate\Http\RedirectResponse;
@@ -36,7 +37,9 @@ class ArticleController extends Controller
      */
     public function create(): View
     {
-        return view('article.create');
+        $authors = Author::all();
+
+        return view('article.create', compact('authors'));
     }
 
     /**
@@ -50,7 +53,7 @@ class ArticleController extends Controller
         $data = [
             'title' => $request->getTitle(),
             'description' => $request->getDescription(),
-            'author' => $request->getAuthor(),
+            'author_id' => $request->getAuthorId(),
             'slug' => $request->getSlug(),
         ];
 
@@ -80,7 +83,9 @@ class ArticleController extends Controller
      */
     public function edit(Article $article): View
     {
-        return view('article.edit', compact('article'));
+        $authors = Author::all();
+
+        return view('article.edit', compact('article', 'authors'));
     }
 
     /**
@@ -94,7 +99,7 @@ class ArticleController extends Controller
     {
         $article->title = $request->getTitle();
         $article->description = $request->getDescription();
-        $article->author = $request->getAuthor();
+        $article->author_id = $request->getAuthorId();
         $article->slug = $request->getSlug();
 
         $article->save();
