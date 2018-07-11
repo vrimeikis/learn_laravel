@@ -42,11 +42,15 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="author">{{ __('Author') }}:</label>
-                                <input id="author" class="form-control" type="text" name="author"
-                                       value="{{ old('author', $article->author) }}">
-                                @if($errors->has('author'))
-                                    <div class="alert-danger">{{ $errors->first('author') }}</div>
+                                <label for="author_id">{{ __('Author') }}:</label>
+                                <select id="author_id" class="form-control" name="author_id">
+                                    <option value=""> ---</option>
+                                    @foreach($authors as $author)
+                                        <option value="{{ $author->id }}" {{ ($author->id == old('author_id', $article->author_id) ? 'selected' : '') }}>{{ $author->first_name }} {{ $author->last_name }}</option>
+                                    @endforeach
+                                </select>
+                                @if($errors->has('author_id'))
+                                    <div class="alert-danger">{{ $errors->first('author_id') }}</div>
                                 @endif
                             </div>
 
