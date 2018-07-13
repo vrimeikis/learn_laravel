@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Article;
 use App\Author;
+use App\Category;
 use App\Http\Requests\ArticleStoreRequest;
 use App\Http\Requests\ArticleUpdateRequest;
 use Illuminate\Http\RedirectResponse;
@@ -37,9 +38,10 @@ class ArticleController extends Controller
      */
     public function create(): View
     {
+        $categories = Category::all();
         $authors = Author::all();
 
-        return view('article.create', compact('authors'));
+        return view('article.create', compact('authors', 'categories'));
     }
 
     /**
@@ -57,7 +59,9 @@ class ArticleController extends Controller
             'slug' => $request->getSlug(),
         ];
 
-        Article::create($data);
+        $article = Article::create($data);
+
+        $article->categories()->attach($request->getCategoriesIds());
 
         return redirect()
             ->route('article.index')
@@ -84,8 +88,9 @@ class ArticleController extends Controller
     public function edit(Article $article): View
     {
         $authors = Author::all();
+        $categories = Category::all();
 
-        return view('article.edit', compact('article', 'authors'));
+        return view('article.edit', compact('article', 'authors', 'categories'));
     }
 
     /**
@@ -101,6 +106,8 @@ class ArticleController extends Controller
         $article->description = $request->getDescription();
         $article->author_id = $request->getAuthorId();
         $article->slug = $request->getSlug();
+
+        $article->categories()->sync($request->getCategoriesIds());
 
         $article->save();
 

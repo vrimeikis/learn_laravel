@@ -58,6 +58,23 @@
                                 @endif
                             </div>
 
+                            <div class="form_group">
+                                <label>{{ __('Categories') }}</label>
+                                <br>
+                                @foreach($categories as $category)
+                                    <label for="category_{{ $category->id }}">
+                                        <input id="category_{{ $category->id }}" type="checkbox" name="category[]"
+                                               value="{{ $category->id }}"
+                                                {{ (in_array($category->id, old('category', [])) ? 'checked' : '') }}
+                                        > {{ $category->title }}
+                                    </label>
+                                    <br>
+                                @endforeach
+                                @if($errors->has('category'))
+                                    <div class="alert-danger">{{ $errors->first('category') }}</div>
+                                @endif
+                            </div>
+
                             <div class="form-group">
                                 <input class="btn btn-success" type="submit" value="{{ __('Save') }}">
                             </div>

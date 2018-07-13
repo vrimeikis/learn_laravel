@@ -8,6 +8,7 @@ use App\Article;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 /**
  * Class ArticleStoreRequest
@@ -36,6 +37,11 @@ class ArticleStoreRequest extends FormRequest
             'title' => 'required|min:3|max:191|string',
             'description' => 'required',
             'author_id' => 'required|exists:authors,id',
+            'category' => [
+                'nullable',
+                'array',
+                'exists:categories,id',
+            ],
         ];
     }
 
@@ -108,5 +114,13 @@ class ArticleStoreRequest extends FormRequest
     public function getTitle(): ? string
     {
         return $this->input('title');
+    }
+
+    /**
+     * @return array
+     */
+    public function getCategoriesIds(): array
+    {
+        return $this->input('category', []);
     }
 }
