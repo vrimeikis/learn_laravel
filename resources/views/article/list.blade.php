@@ -45,6 +45,8 @@
 
                         </table>
 
+                        {{ $articles->links() }}
+
                     </div>
                 </div>
             </div>
