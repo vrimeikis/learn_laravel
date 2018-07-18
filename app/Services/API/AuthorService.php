@@ -18,31 +18,31 @@ declare(strict_types = 1);
 
 namespace App\Services\API;
 
-use App\Exceptions\ArticleException;
-use App\Article;
+use App\Author;
+use App\Exceptions\AuthorException;
 use App\Services\ApiService;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
- * Class ArticleService
+ * Class AuthorService
  * @package App\Services\API
  */
-class ArticleService extends ApiService
+class AuthorService extends ApiService
 {
     /**
      * @param int $page
      * @return LengthAwarePaginator
-     * @throws ArticleException
+     * @throws AuthorException
      */
-    public function getPaginateData(int $page = 1)
+    public function getPaginateData(int $page = 1): LengthAwarePaginator
     {
-        /** @var LengthAwarePaginator $articles */
-        $articles = Article::paginate(self::PER_PAGE, ['*'], 'page', $page);
+        /** @var LengthAwarePaginator $authors */
+        $authors = Author::paginate(self::PER_PAGE, ['*'], 'page', $page);
 
-        if ($articles->isEmpty()) {
-            throw ArticleException::noData();
+        if ($authors->isEmpty()) {
+            throw AuthorException::noData();
         }
 
-        return $articles;
+        return $authors;
     }
 }
