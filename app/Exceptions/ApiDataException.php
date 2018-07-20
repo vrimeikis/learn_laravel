@@ -18,11 +18,24 @@ declare(strict_types = 1);
 
 namespace App\Exceptions;
 
+use Exception;
+
 /**
- * Class ArticleException
+ * Class ApiDataException
  * @package App\Exceptions
  */
-class ArticleException extends ApiDataException
+class ApiDataException extends Exception
 {
+    /**
+     *
+     */
+    const NO_DATA_FOUND = 1001;
 
+    /**
+     * @return ApiDataException
+     */
+    public static function noData(): ApiDataException
+    {
+        return new static('No data found', self::NO_DATA_FOUND);
+    }
 }

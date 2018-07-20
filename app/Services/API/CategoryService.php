@@ -32,7 +32,7 @@ class CategoryService extends ApiService
     /**
      * @param int $page
      * @return LengthAwarePaginator
-     * @throws CategoryException
+     * @throws \App\Exceptions\ApiDataException
      */
     public function getPaginateData(int $page = 1): LengthAwarePaginator
     {

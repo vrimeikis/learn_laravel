@@ -18,24 +18,10 @@ declare(strict_types = 1);
 
 namespace App\Exceptions;
 
-use Exception;
-
 /**
  * Class AuthorException
  * @package App\Exceptions
  */
-class AuthorException extends Exception
+class AuthorException extends ApiDataException
 {
-    /**
-     *
-     */
-    const NO_DATA_FOUND = 1001;
-
-    /**
-     * @return AuthorException
-     */
-    public static function noData(): AuthorException
-    {
-        return new self('No data found', self::NO_DATA_FOUND);
-    }
 }

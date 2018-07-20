@@ -52,6 +52,9 @@ class Article extends Model
         return $this->belongsTo(Author::class, 'author_id', 'id');
     }
 
+    /**
+     * @return BelongsToMany
+     */
     public function categories(): BelongsToMany
     {
         return $this->belongsToMany(Category::class);

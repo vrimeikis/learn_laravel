@@ -70,4 +70,28 @@ class ArticleController extends Controller
             ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    public function getFullData(Request $request): JsonResponse
+    {
+        try {
+            $articles = $this->articleService->getFullData((int)$request->page);
+
+            return response()->json([
+                'success' => true,
+                'data' => $articles,
+            ]);
+        } catch (ArticleException $exception) {
+            return response()->json([
+                'success' => false,
+                'message' => $exception->getMessage(),
+                'code' => $exception->getCode(),
+            ], JsonResponse::HTTP_NOT_FOUND);
+        } catch (Throwable $exception) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Something wrong.',
+                'code' => $exception->getCode(),
+            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }

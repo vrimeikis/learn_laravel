@@ -18,24 +18,10 @@ declare(strict_types = 1);
 
 namespace App\Exceptions;
 
-use Exception;
-
 /**
  * Class CategoryException
  * @package App\Exceptions
  */
-class CategoryException extends Exception
+class CategoryException extends ApiDataException
 {
-    /**
-     *
-     */
-    const NO_DATA_FOUND = 1001;
-
-    /**
-     * @return CategoryException
-     */
-    public static function noData(): CategoryException
-    {
-        return new self('No data found', self::NO_DATA_FOUND);
-    }
 }

@@ -32,7 +32,7 @@ class AuthorService extends ApiService
     /**
      * @param int $page
      * @return LengthAwarePaginator
-     * @throws AuthorException
+     * @throws \App\Exceptions\ApiDataException
      */
     public function getPaginateData(int $page = 1): LengthAwarePaginator
     {
@@ -44,5 +44,14 @@ class AuthorService extends ApiService
         }
 
         return $authors;
+    }
+
+    /**
+     * @param int $authorId
+     * @return Author
+     */
+    public function getById(int $authorId): Author
+    {
+        return Author::findOrFail($authorId);
     }
 }
