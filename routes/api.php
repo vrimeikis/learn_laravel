@@ -19,3 +19,4 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::get('articles', 'API\\ArticleController@getPaginate');
 Route::get('authors', 'API\\AuthorController@getPaginate');
+Route::get('category', 'API\\CategoryController@getPaginate');
