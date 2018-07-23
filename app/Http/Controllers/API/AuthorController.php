@@ -18,6 +18,7 @@ declare(strict_types = 1);
 
 namespace App\Http\Controllers\API;
 
+use App\DTO\AuthorDTO;
 use App\Exceptions\AuthorException;
 use App\Services\API\AuthorService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -82,18 +83,14 @@ class AuthorController extends Controller
     }
 
     /**
-     * @param int $id
-     * @return JsonResponse
+     * @param Request $request
+     * @param int $id Author ID
+     * @return AuthorDTO
      */
-    public function getById(Request $request, int $id): JsonResponse
+    public function getById(Request $request, int $id): AuthorDTO
     {
         try {
-            $author = $this->authorService->getById($id);
-
-            return response()->json([
-                'success' => true,
-                'data' => $author,
-            ]);
+            return $this->authorService->getById($id);
         } catch (ModelNotFoundException $exception) {
             logger($exception->getMessage(), [
                 'code' => $exception->getCode(),
@@ -101,12 +98,15 @@ class AuthorController extends Controller
                 'path' => $request->path(),
                 'url' => $request->url(),
             ]);
+
             return response()->json([
                 'success' => false,
                 'message' => 'No data found.',
                 'code' => $exception->getCode(),
             ], JsonResponse::HTTP_NOT_FOUND);
         } catch (\Throwable $exception) {
+            dd($exception->getMessage());
+
             return response()->json([
                 'success' => false,
                 'message' => 'Something wrong.',

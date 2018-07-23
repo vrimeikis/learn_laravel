@@ -19,6 +19,7 @@ declare(strict_types = 1);
 namespace App\Services\API;
 
 use App\Author;
+use App\DTO\AuthorDTO;
 use App\Exceptions\AuthorException;
 use App\Services\ApiService;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -46,12 +47,15 @@ class AuthorService extends ApiService
         return $authors;
     }
 
-    /**
-     * @param int $authorId
-     * @return Author
-     */
-    public function getById(int $authorId): Author
+    public function getById(int $authorId): AuthorDTO
     {
-        return Author::findOrFail($authorId);
+        /** @var Author $author */
+        $author = Author::findOrFail($authorId);
+
+        $dto = new AuthorDTO();
+
+        return $dto->setAuthorid($author->id)
+            ->setFirstName($author->first_name)
+            ->setLastName($author->last_name);
     }
 }
