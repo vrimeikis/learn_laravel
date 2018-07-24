@@ -18,13 +18,16 @@ declare(strict_types = 1);
 
 namespace App\Http\Controllers\API;
 
-use Throwable;
+use App\DTO\ArticleDTO;
+use App\DTO\ArticlesDTO;
+use App\DTO\PaginatorDTO;
 use App\Exceptions\ArticleException;
+use App\Http\Controllers\Controller;
 use App\Services\API\ArticleService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Throwable;
 
 class ArticleController extends Controller
 {
@@ -35,17 +38,19 @@ class ArticleController extends Controller
         $this->articleService = $articleService;
     }
 
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function getPaginate(Request $request): JsonResponse
     {
         try {
-            /** @var LengthAwarePaginator $articles */
-            $articles = $this->articleService->getPaginateData((int)$request->page);
+            /** @var PaginatorDTO $articles */
+            $articles = $this->articleService->getPaginateData();
 
             return response()->json([
                 'status' => true,
-                'data' => $articles->getCollection(),
-                'current_page' => $articles->currentPage(),
-                'total_page' => $articles->lastPage(),
+                'data' => $articles,
             ]);
         } catch (ArticleException $exception) {
 
@@ -65,7 +70,7 @@ class ArticleController extends Controller
 
             return response()->json([
                 'status' => false,
-                'message' => 'Somethink wrong',
+                'message' => $exception->getMessage(),
                 'code' => JsonResponse::HTTP_INTERNAL_SERVER_ERROR,
             ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -91,6 +96,24 @@ class ArticleController extends Controller
                 'success' => false,
                 'message' => 'Something wrong.',
                 'code' => $exception->getCode(),
+            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function getById(int $articleId): JsonResponse
+    {
+        try {
+            $article = $this->articleService->getByIdForApi($articleId);
+
+            return response()->json([
+                'success' => true,
+                'data' => $article
+            ]);
+        } catch (Throwable $exception) {
+            return response()->json([
+                'success' => false,
+                'code' => $exception->getCode(),
+                'message' => $exception->getMessage(),
             ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
     }

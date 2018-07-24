@@ -57,9 +57,7 @@ class AuthorController extends Controller
 
             return response()->json([
                 'status' => true,
-                'data' => $authors->getCollection(),
-                'current_page' => $authors->currentPage(),
-                'total_page' => $authors->lastPage(),
+                'data' => $authors,
             ]);
         } catch (AuthorException $exception) {
             return response()->json(

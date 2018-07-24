@@ -18,6 +18,9 @@ declare(strict_types = 1);
 
 namespace App\Services\API;
 
+use App\DTO\ArticleDTO;
+use App\DTO\ArticlesDTO;
+use App\DTO\PaginatorDTO;
 use App\Exceptions\ArticleException;
 use App\Article;
 use App\Services\ApiService;
@@ -30,20 +33,36 @@ use Illuminate\Pagination\LengthAwarePaginator;
 class ArticleService extends ApiService
 {
     /**
-     * @param int $page
-     * @return LengthAwarePaginator
+     * @return PaginatorDTO
      * @throws \App\Exceptions\ApiDataException
      */
-    public function getPaginateData(int $page = 1): LengthAwarePaginator
+    public function getPaginateData(): PaginatorDTO
     {
         /** @var LengthAwarePaginator $articles */
-        $articles = Article::paginate(self::PER_PAGE, ['*'], 'page', $page);
+        $articles = Article::paginate(self::PER_PAGE);
 
         if ($articles->isEmpty()) {
             throw ArticleException::noData();
         }
 
-        return $articles;
+        $articlesDTO = new ArticlesDTO();
+
+        /** @var Article $article */
+        foreach ($articles as $article) {
+            $articlesDTO->setArticle(
+                new ArticleDTO($article->id, $article->title, $article->description)
+            );
+        }
+
+        return new PaginatorDTO(
+            $articles->currentPage(),
+            collect($articlesDTO)->get('data'),
+            $articles->lastPage(),
+            $articles->perPage(),
+            $articles->total(),
+            $articles->nextPageUrl(),
+            $articles->previousPageUrl()
+        );
     }
 
     public function getFullData(int $page = 1): LengthAwarePaginator
@@ -56,5 +75,13 @@ class ArticleService extends ApiService
         }
 
         return $articles;
+    }
+
+    public function getByIdForApi(int $articleId): ArticleDTO
+    {
+        /** @var Article $article */
+        $article = Article::findOrFail($articleId);
+
+        return new ArticleDTO($article->id, $article->title, $article->description);
     }
 }
