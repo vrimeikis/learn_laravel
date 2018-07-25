@@ -19,6 +19,9 @@ declare(strict_types = 1);
 namespace App\Services\API;
 
 use App\Category;
+use App\DTO\CategoriesDTO;
+use App\DTO\CategoryDTO;
+use App\DTO\PaginatorDTO;
 use App\Exceptions\CategoryException;
 use App\Services\ApiService;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -30,19 +33,49 @@ use Illuminate\Pagination\LengthAwarePaginator;
 class CategoryService extends ApiService
 {
     /**
-     * @param int $page
-     * @return LengthAwarePaginator
+     * @return PaginatorDTO
      * @throws \App\Exceptions\ApiDataException
+     * @throws CategoryException
      */
-    public function getPaginateData(int $page = 1): LengthAwarePaginator
+    public function getPaginateDTOData(): PaginatorDTO
     {
         /** @var LengthAwarePaginator $categories */
-        $categories = Category::paginate(self::PER_PAGE, ['*'], 'page', $page);
+        $categories = Category::paginate(self::PER_PAGE);
 
         if ($categories->isEmpty()) {
             throw CategoryException::noData();
         }
 
-        return $categories;
+        $categoriesDTO = new CategoriesDTO();
+
+        /** @var Category $category */
+        foreach ($categories as $category) {
+            $categoriesDTO->setCategoryData(
+                new CategoryDTO($category->id, $category->title, $category->slug)
+            );
+        }
+
+        $paginatorDTO = new PaginatorDTO(
+            $categories->currentPage(),
+            collect($categoriesDTO)->get('data'),
+            $categories->lastPage(),
+            $categories->perPage(),
+            $categories->total(),
+            $categories->nextPageUrl(),
+            $categories->previousPageUrl());
+
+        return $paginatorDTO;
+    }
+
+    /**
+     * @param int $categoryId
+     * @return CategoryDTO
+     */
+    public function getById(int $categoryId): CategoryDTO
+    {
+        /** @var Category $category */
+        $category = Category::findOrFail($categoryId);
+
+        return new CategoryDTO($category->id, $category->title, $category->slug);
     }
 }

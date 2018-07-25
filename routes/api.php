@@ -19,12 +19,15 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::group(['prefix' => 'articles'], function () {
     Route::get('/', 'API\\ArticleController@getPaginate');
-    Route::get('full', 'API\\ArticleController@getFullData');
-
     Route::get('one/{articleId}', 'API\\ArticleController@getById');
+    Route::get('one/{articleId}/full', 'API\\ArticleController@getByIdFull');
+    Route::get('full', 'API\\ArticleController@getFullData');
 });
 
-Route::get('categories', 'API\\CategoryController@getPaginate');
+Route::group(['prefix' => 'categories'], function () {
+    Route::get('/', 'API\\CategoryController@getPaginate');
+    Route::get('one/{categoryId}', 'API\\CategoryController@getById');
+});
 
 Route::group(['prefix' => 'author'], function () {
     Route::get('/', 'API\\AuthorController@getPaginate');

@@ -18,18 +18,12 @@ declare(strict_types = 1);
 
 namespace App\DTO;
 
-use App\DTO\Interfaces\ArticleDTOInterface;
-
-/**
- * Class ArticleDTO
- * @package App\DTO
- */
-class ArticleDTO extends BaseDTO implements ArticleDTOInterface
+class CategoryDTO extends BaseDTO
 {
     /**
      * @var int
      */
-    private $articleId;
+    private $categoryId;
     /**
      * @var string
      */
@@ -37,19 +31,19 @@ class ArticleDTO extends BaseDTO implements ArticleDTOInterface
     /**
      * @var string
      */
-    private $description;
+    private $slug;
 
     /**
-     * ArticleDTO constructor.
-     * @param int $articleId
+     * CategoryDTO constructor.
+     * @param int $categoryId
      * @param string $title
-     * @param string|null $description
+     * @param string $slug
      */
-    public function __construct(int $articleId, string $title, string $description = null)
+    public function __construct(int $categoryId, string $title, string $slug)
     {
-        $this->articleId = $articleId;
+        $this->categoryId = $categoryId;
         $this->title = $title;
-        $this->description = $description;
+        $this->slug = $slug;
     }
 
     /**
@@ -58,9 +52,9 @@ class ArticleDTO extends BaseDTO implements ArticleDTOInterface
     protected function jsonData(): array
     {
         return [
-            'article_id' => $this->articleId,
+            'category_id' => $this->categoryId,
             'title' => $this->title,
-            'description' => $this->description,
+            'slug' => $this->slug,
         ];
     }
 }

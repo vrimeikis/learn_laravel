@@ -18,11 +18,11 @@ declare(strict_types = 1);
 
 namespace App\Http\Controllers\API;
 
+use App\DTO\PaginatorDTO;
 use App\Exceptions\CategoryException;
+use App\Http\Controllers\Controller;
 use App\Services\API\CategoryService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 
 /**
  * Class CategoryController
@@ -45,19 +45,17 @@ class CategoryController extends Controller
     }
 
     /**
-     * @param Request $request
      * @return JsonResponse
      */
-    public function getPaginate(Request $request): JsonResponse
+    public function getPaginate(): JsonResponse
     {
         try {
-            $authors = $this->categoryService->getPaginateData((int)$request->page);
+            /** @var PaginatorDTO $categories */
+            $categories = $this->categoryService->getPaginateDTOData();
 
             return response()->json([
                 'status' => true,
-                'data' => $authors->getCollection(),
-                'current_page' => $authors->currentPage(),
-                'total_page' => $authors->lastPage(),
+                'data' => $categories,
             ]);
         } catch (CategoryException $exception) {
             return response()->json(
@@ -77,6 +75,24 @@ class CategoryController extends Controller
                 ],
                 JsonResponse::HTTP_INTERNAL_SERVER_ERROR
             );
+        }
+    }
+
+    public function getById(int $categoryId): JsonResponse
+    {
+        try {
+            $category = $this->categoryService->getById($categoryId);
+
+            return response()->json([
+                'status' => true,
+                'data' => $category,
+            ]);
+        } catch (\Throwable $exception) {
+            return response()->json([
+                'status' => false,
+                'message' => $exception->getMessage(),
+                'code' => $exception->getCode(),
+            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }

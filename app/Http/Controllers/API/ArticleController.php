@@ -29,10 +29,21 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Throwable;
 
+/**
+ * Class ArticleController
+ * @package App\Http\Controllers\API
+ */
 class ArticleController extends Controller
 {
+    /**
+     * @var ArticleService
+     */
     private $articleService;
 
+    /**
+     * ArticleController constructor.
+     * @param ArticleService $articleService
+     */
     public function __construct(ArticleService $articleService)
     {
         $this->articleService = $articleService;
@@ -76,10 +87,13 @@ class ArticleController extends Controller
         }
     }
 
-    public function getFullData(Request $request): JsonResponse
+    /**
+     * @return JsonResponse
+     */
+    public function getFullData(): JsonResponse
     {
         try {
-            $articles = $this->articleService->getFullData((int)$request->page);
+            $articles = $this->articleService->getFullData();
 
             return response()->json([
                 'success' => true,
@@ -100,6 +114,10 @@ class ArticleController extends Controller
         }
     }
 
+    /**
+     * @param int $articleId
+     * @return JsonResponse
+     */
     public function getById(int $articleId): JsonResponse
     {
         try {
@@ -114,6 +132,28 @@ class ArticleController extends Controller
                 'success' => false,
                 'code' => $exception->getCode(),
                 'message' => $exception->getMessage(),
+            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /**
+     * @param int $articleId
+     * @return JsonResponse
+     */
+    public function getByIdFull(int $articleId): JsonResponse
+    {
+        try {
+            $articleFull = $this->articleService->getFullByIdForApi($articleId);
+
+            return response()->json([
+                'success' => true,
+                'data' => $articleFull,
+            ]);
+        } catch (Throwable $exception) {
+            return response()->json([
+                'status' => false,
+                'message' => $exception->getMessage(),
+                'code' => $exception->getCode(),
             ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
     }

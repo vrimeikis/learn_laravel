@@ -6,6 +6,7 @@ namespace App;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -22,6 +23,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property string $slug
  * @property int|null $author_id
  * @property-read Author|null $author
+ * @property-read Collection|Category[] $categories
  * @method static Builder|Article whereAuthorId($value)
  * @method static Builder|Article whereCreatedAt($value)
  * @method static Builder|Article whereDescription($value)

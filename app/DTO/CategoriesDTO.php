@@ -18,22 +18,22 @@ declare(strict_types = 1);
 
 namespace App\DTO;
 
-use App\DTO\Interfaces\ArticleDTOInterface;
+use Illuminate\Support\Collection;
 
 
 /**
- * Class ArticlesDTO
+ * Class CategoriesDTO
  * @package App\DTO
  */
-class ArticlesDTO extends BaseDTO
+class CategoriesDTO extends BaseDTO
 {
     /**
-     * @var \Illuminate\Support\Collection
+     * @var Collection
      */
     private $collectionData;
 
     /**
-     * ArticlesDTO constructor.
+     * CategoriesDTO constructor.
      */
     public function __construct()
     {
@@ -41,12 +41,12 @@ class ArticlesDTO extends BaseDTO
     }
 
     /**
-     * @param ArticleDTOInterface $articleDTO
-     * @return ArticlesDTO
+     * @param CategoryDTO $categoryDTO
+     * @return CategoriesDTO
      */
-    public function setArticle(ArticleDTOInterface $articleDTO): ArticlesDTO
+    public function setCategoryData(CategoryDTO $categoryDTO): CategoriesDTO
     {
-        $this->collectionData->push($articleDTO);
+        $this->collectionData->push($categoryDTO);
 
         return $this;
     }
