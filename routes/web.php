@@ -24,4 +24,5 @@ Route::resource('article', 'ArticleController');
 Route::group(['middleware' => ['auth']], function () {
     Route::resource('author', 'AuthorController')->except(['show', 'destroy']);
     Route::resource('category', 'CategoryController')->except(['show', 'destroy']);
+    Route::resource('user', 'UserController')->only(['index']);
 });
