@@ -34,4 +34,19 @@ class UserService
     {
         return User::paginate();
     }
+
+    /**
+     * @param string $name
+     * @param string $email
+     * @param string $password
+     * @return User
+     */
+    public function create(string $name, string $email, string $password): User
+    {
+        return User::create([
+            'name' => $name,
+            'email' => $email,
+            'password' => bcrypt($password),
+        ]);
+    }
 }
