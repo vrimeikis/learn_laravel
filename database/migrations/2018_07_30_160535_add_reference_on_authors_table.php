@@ -15,11 +15,13 @@ class AddReferenceOnAuthorsTable extends Migration
      */
     public function up(): void
     {
-        Schema::table('authors', function (Blueprint $table) {
-            $table->integer('reference_author_id')
-                ->nullable()
-                ->comment('Author id from 3trd party application');
-        });
+        if (!Schema::hasColumn('authors', 'reference_author_id')) {
+            Schema::table('authors', function(Blueprint $table) {
+                $table->integer('reference_author_id')
+                    ->nullable()
+                    ->comment('Author id from 3trd party application');
+            });
+        }
     }
 
     /**

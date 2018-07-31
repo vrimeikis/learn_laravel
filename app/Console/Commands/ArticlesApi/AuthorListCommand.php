@@ -68,7 +68,7 @@ class AuthorListCommand extends Command
             exit();
         }
 
-        foreach ($data->data as $row) {
+        foreach ($data->data->data as $row) {
             $author = $this->saveData($row);
             $this->info('Updated or created author with refernce: ' . $author->reference_author_id);
         }
