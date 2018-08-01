@@ -1,18 +1,17 @@
 <?php
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace App\Console\Commands\ArticlesApi;
 
 use App\Author;
 use GuzzleHttp\Client;
-use Illuminate\Console\Command;
 
 /**
  * Class AuthorByReferenceCommand
  * @package App\Console\Commands\ArticlesApi
  */
-class AuthorByReferenceCommand extends Command
+class AuthorByReferenceCommand extends ArticleBase
 {
     /**
      * The name and signature of the console command.
@@ -29,15 +28,6 @@ class AuthorByReferenceCommand extends Command
     protected $description = 'Get author info by reference ID';
 
     /**
-     * @var \Illuminate\Config\Repository|mixed
-     */
-    private $url;
-    /**
-     * @var \Illuminate\Config\Repository|mixed
-     */
-    private $version;
-
-    /**
      * Create a new command instance.
      *
      * @return void
@@ -45,9 +35,6 @@ class AuthorByReferenceCommand extends Command
     public function __construct()
     {
         parent::__construct();
-
-        $this->url = config('article_api.api_url');
-        $this->version = config('article_api.api_version');
     }
 
     /**
@@ -85,8 +72,11 @@ class AuthorByReferenceCommand extends Command
     /**
      * @return string
      */
-    private function getCallUrl(): string
+    protected function getCallUrl(): string
     {
-        return sprintf('%s/%s/author/%d', $this->url, $this->version, $this->argument('reference_author_id'));
+        return strtr(':url/author/:id', [
+            ':url' => parent::getCallUrl(),
+            ':id' => $this->argument('reference_author_id'),
+        ]);
     }
 }

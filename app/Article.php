@@ -23,11 +23,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property string $slug
  * @property int|null $author_id
  * @property-read Author|null $author
+ * @property int|null $reference_article_id
  * @property-read Collection|Category[] $categories
  * @method static Builder|Article whereAuthorId($value)
  * @method static Builder|Article whereCreatedAt($value)
  * @method static Builder|Article whereDescription($value)
  * @method static Builder|Article whereId($value)
+ * @method static Builder|Article whereReferenceArticleId($value)
  * @method static Builder|Article whereSlug($value)
  * @method static Builder|Article whereTitle($value)
  * @method static Builder|Article whereUpdatedAt($value)
@@ -42,7 +44,8 @@ class Article extends Model
         'title',
         'description',
         'slug',
-        'author_id'
+        'author_id',
+        'reference_article_id',
     ];
 
 

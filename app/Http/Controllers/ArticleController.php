@@ -29,7 +29,7 @@ class ArticleController extends Controller
     public function index(): View
     {
         /** @var LengthAwarePaginator $articles */
-        $articles = Article::paginate(2, ['*'], 'page', 2);
+        $articles = Article::paginate();
 
         return view('article.list', compact('articles'));
     }

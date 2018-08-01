@@ -20,13 +20,12 @@ namespace App\Console\Commands\ArticlesApi;
 
 use App\Category;
 use GuzzleHttp\Client;
-use Illuminate\Console\Command;
 
 /**
  * Class CategoryListCommand
  * @package App\Console\Commands\ArticlesApi
  */
-class CategoryListCommand extends Command
+class CategoryListCommand extends ArticleBase
 {
     /**
      * The name and signature of the console command.
@@ -40,27 +39,14 @@ class CategoryListCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Get catgeories paginator list';
-    /**
-     * @var \Illuminate\Config\Repository|mixed
-     */
-    private $url;
-    /**
-     * @var \Illuminate\Config\Repository|mixed
-     */
-    private $version;
+    protected $description = 'Get categories paginator list';
 
     /**
-     * Create a new command instance.
-     *
-     * @return void
+     * CategoryListCommand constructor.
      */
     public function __construct()
     {
         parent::__construct();
-
-        $this->url = config('article_api.api_url');
-        $this->version = config('article_api.api_version');
     }
 
     /**
@@ -96,11 +82,10 @@ class CategoryListCommand extends Command
     /**
      * @return string
      */
-    private function getCallUrl(): string
+    protected function getCallUrl(): string
     {
-        return strtr(':domain/:version/category', [
-            ':domain' => $this->url,
-            ':version' => $this->version,
+        return strtr(':url/category', [
+            ':url' => parent::getCallUrl(),
         ]);
     }
 

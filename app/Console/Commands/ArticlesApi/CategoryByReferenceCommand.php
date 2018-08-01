@@ -20,13 +20,12 @@ namespace App\Console\Commands\ArticlesApi;
 
 use App\Category;
 use GuzzleHttp\Client;
-use Illuminate\Console\Command;
 
 /**
  * Class CategoryByReferenceCommand
  * @package App\Console\Commands\ArticlesApi
  */
-class CategoryByReferenceCommand extends Command
+class CategoryByReferenceCommand extends ArticleBase
 {
     /**
      * The name and signature of the console command.
@@ -41,27 +40,15 @@ class CategoryByReferenceCommand extends Command
      * @var string
      */
     protected $description = 'Get category by id';
-    /**
-     * @var \Illuminate\Config\Repository|mixed
-     */
-    private $url;
-    /**
-     * @var \Illuminate\Config\Repository|mixed
-     */
-    private $version;
 
     /**
-     * Create a new command instance.
-     *
-     * @return void
+     * CategoryByReferenceCommand constructor.
      */
     public function __construct()
     {
         parent::__construct();
-
-        $this->url = config('article_api.api_url');
-        $this->version = config('article_api.api_version');
     }
+
 
     /**
      * Execute the console command.
@@ -96,11 +83,10 @@ class CategoryByReferenceCommand extends Command
     /**
      * @return string
      */
-    private function getCallUrl()
+    protected function getCallUrl(): string
     {
-        return strtr(':url/:version/category/:id', [
-            ':url' => $this->url,
-            ':version' => $this->version,
+        return strtr(':url/category/:id', [
+            ':url' => parent::getCallUrl(),
             ':id' => $this->argument('reference_category_id'),
         ]);
     }

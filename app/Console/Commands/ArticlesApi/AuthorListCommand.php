@@ -6,13 +6,12 @@ namespace App\Console\Commands\ArticlesApi;
 
 use App\Author;
 use GuzzleHttp\Client;
-use Illuminate\Console\Command;
 
 /**
  * Class AuthorListCommand
  * @package App\Console\Commands\ArticlesApi
  */
-class AuthorListCommand extends Command
+class AuthorListCommand extends ArticleBase
 {
     /**
      * The name and signature of the console command.
@@ -26,14 +25,6 @@ class AuthorListCommand extends Command
      * @var string
      */
     protected $description = 'Get authors list';
-    /**
-     * @var \Illuminate\Config\Repository|mixed
-     */
-    private $url;
-    /**
-     * @var \Illuminate\Config\Repository|mixed
-     */
-    private $version;
 
     /**
      * Create a new command instance.
@@ -43,9 +34,6 @@ class AuthorListCommand extends Command
     public function __construct()
     {
         parent::__construct();
-
-        $this->url = config('article_api.api_url');
-        $this->version = config('article_api.api_version');
     }
 
     /**
@@ -89,8 +77,10 @@ class AuthorListCommand extends Command
     /**
      * @return string
      */
-    private function getCallUrl(): string
+    protected function getCallUrl(): string
     {
-        return sprintf('%s/%s/author', $this->url, $this->version);
+        return strtr(':url/author', [
+            ':url' => $this->url,
+        ]);
     }
 }
