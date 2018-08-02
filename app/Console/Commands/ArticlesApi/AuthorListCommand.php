@@ -39,26 +39,35 @@ class AuthorListCommand extends ArticleBase
     /**
      * Execute the console command.
      *
+     * @param string|null $url
      * @return void
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function handle(): void
+    public function handle(string $url = null): void
     {
-        $client = new Client();
+        try {
+            $client = new Client();
 
-        $result = $client->request('GET', $this->getCallUrl());
+            $result = $client->get(($url) ? $url : $this->getCallUrl());
 
-        $data = json_decode($result->getBody()->getContents());
+            $data = json_decode($result->getBody()->getContents());
 
-        if (!$data->success) {
-            logger($data->message, $data);
+            if (!$data->success) {
+                logger($data->message, $data);
 
-            exit();
-        }
+                exit();
+            }
 
-        foreach ($data->data->data as $row) {
-            $author = $this->saveData($row);
-            $this->info('Updated or created author with refernce: ' . $author->reference_author_id);
+            foreach ($data->data->data as $row) {
+                $author = $this->saveData($row);
+                $this->info('Updated or created author with refernce: ' . $author->reference_author_id);
+            }
+
+            if ($url = $data->data->next_page_url) {
+                $this->handle($url);
+            }
+        } catch (\Throwable $exception) {
+            $this->error($exception->getMessage());
         }
     }
 
@@ -80,7 +89,7 @@ class AuthorListCommand extends ArticleBase
     protected function getCallUrl(): string
     {
         return strtr(':url/author', [
-            ':url' => $this->url,
+            ':url' => parent::getCallUrl(),
         ]);
     }
 }

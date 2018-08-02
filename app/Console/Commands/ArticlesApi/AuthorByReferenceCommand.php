@@ -4,8 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Console\Commands\ArticlesApi;
 
-use App\Author;
-use GuzzleHttp\Client;
+use App\Services\ClientAPI\ClientAuthorService;
 
 /**
  * Class AuthorByReferenceCommand
@@ -26,6 +25,10 @@ class AuthorByReferenceCommand extends ArticleBase
      * @var string
      */
     protected $description = 'Get author info by reference ID';
+    /**
+     * @var ClientAuthorService
+     */
+    private $authorService;
 
     /**
      * Create a new command instance.
@@ -35,6 +38,8 @@ class AuthorByReferenceCommand extends ArticleBase
     public function __construct()
     {
         parent::__construct();
+
+        $this->authorService = app()->make(ClientAuthorService::class);
     }
 
     /**
@@ -46,9 +51,7 @@ class AuthorByReferenceCommand extends ArticleBase
     public function handle(): void
     {
         try {
-            $client = new Client();
-
-            $result = $client->request('GET', $this->getCallUrl());
+            $result = $this->client->request('GET', $this->getCallUrl());
 
             $data = json_decode($result->getBody()->getContents());
 
@@ -57,12 +60,9 @@ class AuthorByReferenceCommand extends ArticleBase
                 exit();
             }
 
-            Author::updateOrCreate(
-                ['first_name' => $data->data->first_name, 'last_name' => $data->data->last_name],
-                ['reference_author_id' => $data->data->author_id]
-            );
+            $author = $this->authorService->saveAuthorFromObject($data->data);
 
-            $this->info('Row updated or created success with reference author ID: ' . $data->data->author_id);
+            $this->info('Row updated or created success with reference author ID: ' . $author->id);
 
         } catch (\Throwable $exception) {
             $this->error($exception->getMessage());

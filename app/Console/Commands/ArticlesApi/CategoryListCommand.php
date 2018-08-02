@@ -52,15 +52,16 @@ class CategoryListCommand extends ArticleBase
     /**
      * Execute the console command.
      *
+     * @param string|null $url
      * @return void
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function handle(): void
+    public function handle(string $url = null): void
     {
         try {
             $client = new Client();
 
-            $response = $client->request('GET', $this->getCallUrl());
+            $response = $client->get(($url) ? $url : $this->getCallUrl());
 
             $result = json_decode($response->getBody()->getContents());
 
@@ -72,6 +73,10 @@ class CategoryListCommand extends ArticleBase
             foreach ($result->data->data as $row) {
                 $category = $this->saveData($row);
                 $this->info('Category with slug: ' . $category->slug . ', updated or created successfully.');
+            }
+
+            if ($url = $result->data->next_page_url) {
+                $this->handle($url);
             }
 
         } catch (\Throwable $exception) {

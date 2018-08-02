@@ -6,8 +6,13 @@ namespace App\Console\Commands\ArticlesApi;
 
 use App\Article;
 use App\Author;
+use App\Category;
 use GuzzleHttp\Client;
 
+/**
+ * Class ArticleByReferenceCommand
+ * @package App\Console\Commands\ArticlesApi
+ */
 class ArticleByReferenceCommand extends ArticleBase
 {
     /**
@@ -60,6 +65,9 @@ class ArticleByReferenceCommand extends ArticleBase
         }
     }
 
+    /**
+     * @return string
+     */
     protected function getCallUrl(): string
     {
         return strtr(':url/article/:id', [
@@ -68,9 +76,14 @@ class ArticleByReferenceCommand extends ArticleBase
         ]);
     }
 
+    /**
+     * @param \stdClass $article
+     * @return Article
+     */
     private function saveData(\stdClass $article): Article
     {
-        return Article::updateOrCreate(
+        /** @var Article $result */
+        $result = Article::updateOrCreate(
             ['slug' => $article->slug],
             [
                 'title' => $article->title,
@@ -79,13 +92,47 @@ class ArticleByReferenceCommand extends ArticleBase
                 'author_id' => $this->saveAuthor($article->author)->id,
             ]
         );
+
+        $categoriesIds = $this->saveCategories($article->categories);
+
+        $result->categories()->sync($categoriesIds);
+
+        return $result;
     }
 
+    /**
+     * @param \stdClass $author
+     * @return Author
+     */
     private function saveAuthor(\stdClass $author): Author
     {
         return Author::updateOrCreate(
             ['reference_author_id' => $author->author_id],
-            ['first_name' => $author->first_name, 'last_name' => $author->last_name]
+            [
+                'first_name' => $author->first_name,
+                'last_name' => $author->last_name,
+            ]
         );
+    }
+
+    /**
+     * @param array $categories
+     * @return array
+     */
+    private function saveCategories(array $categories = []): array
+    {
+        $ids = [];
+
+        foreach ($categories as $category) {
+            array_push($ids, Category::updateOrCreate(
+                ['reference_category_id' => $category->category_id],
+                [
+                    'title' => $category->title,
+                    'slug' => $category->slug,
+                ]
+            )->id);
+        }
+
+        return $ids;
     }
 }

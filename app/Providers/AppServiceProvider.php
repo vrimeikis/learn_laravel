@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Services\API\ArticleService;
 use App\Services\API\AuthorService;
+use App\Services\ClientAPI\ClientAuthorService;
 use App\Services\UserService;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
@@ -42,5 +43,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(ArticleService::class);
         $this->app->singleton(AuthorService::class);
         $this->app->singleton(UserService::class);
+
+        $this->app->singleton(ClientAuthorService::class);
     }
 }
