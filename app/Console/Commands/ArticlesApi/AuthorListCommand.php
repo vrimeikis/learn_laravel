@@ -4,8 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Console\Commands\ArticlesApi;
 
-use App\Author;
-use GuzzleHttp\Client;
+use App\Services\ClientAPI\ClientAuthorService;
 
 /**
  * Class AuthorListCommand
@@ -25,6 +24,10 @@ class AuthorListCommand extends ArticleBase
      * @var string
      */
     protected $description = 'Get authors list';
+    /**
+     * @var ClientAuthorService
+     */
+    private $clientAuthorService;
 
     /**
      * Create a new command instance.
@@ -34,6 +37,8 @@ class AuthorListCommand extends ArticleBase
     public function __construct()
     {
         parent::__construct();
+
+        $this->clientAuthorService = app()->make(ClientAuthorService::class);
     }
 
     /**
@@ -46,21 +51,16 @@ class AuthorListCommand extends ArticleBase
     public function handle(string $url = null): void
     {
         try {
-            $client = new Client();
-
-            $result = $client->get(($url) ? $url : $this->getCallUrl());
+            $result = $this->client->get(($url) ? $url : $this->getCallUrl());
 
             $data = json_decode($result->getBody()->getContents());
 
-            if (!$data->success) {
-                logger($data->message, $data);
-
-                exit();
-            }
+            $this->checkSuccess($data);
 
             foreach ($data->data->data as $row) {
-                $author = $this->saveData($row);
-                $this->info('Updated or created author with refernce: ' . $author->reference_author_id);
+                $author = $this->clientAuthorService->saveAuthorFromObject($row);
+
+                $this->info('Updated or created author with reference: ' . $author->reference_author_id);
             }
 
             if ($url = $data->data->next_page_url) {
@@ -69,18 +69,6 @@ class AuthorListCommand extends ArticleBase
         } catch (\Throwable $exception) {
             $this->error($exception->getMessage());
         }
-    }
-
-    /**
-     * @param \stdClass $data
-     * @return Author
-     */
-    private function saveData(\stdClass $data): Author
-    {
-        return Author::updateOrCreate(
-            ['first_name' => $data->first_name, 'last_name' => $data->last_name],
-            ['reference_author_id' => $data->author_id]
-        );
     }
 
     /**

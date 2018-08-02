@@ -55,10 +55,7 @@ class AuthorByReferenceCommand extends ArticleBase
 
             $data = json_decode($result->getBody()->getContents());
 
-            if (!$data->success) {
-                $this->error($data->message);
-                exit();
-            }
+            $this->checkSuccess($data);
 
             $author = $this->authorService->saveAuthorFromObject($data->data);
 

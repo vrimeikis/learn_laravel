@@ -18,10 +18,7 @@ declare(strict_types = 1);
 
 namespace App\Console\Commands\ArticlesApi;
 
-use App\Article;
-use App\Author;
-use App\Category;
-use GuzzleHttp\Client;
+use App\Services\ClientAPI\ClientArticleService;
 
 /**
  * Class ArticleListCommand
@@ -42,6 +39,10 @@ class ArticleListCommand extends ArticleBase
      * @var string
      */
     protected $description = 'Get list articles';
+    /**
+     * @var ClientArticleService
+     */
+    private $clientArticleService;
 
     /**
      * Create a new command instance.
@@ -51,6 +52,8 @@ class ArticleListCommand extends ArticleBase
     public function __construct()
     {
         parent::__construct();
+
+        $this->clientArticleService = app()->make(ClientArticleService::class);
     }
 
     /**
@@ -62,19 +65,14 @@ class ArticleListCommand extends ArticleBase
     public function handle(string $url = null): void
     {
         try {
-            $client = new Client();
-
-            $response = $client->get(($url) ? $url : $this->getCallUrl());
+            $response = $this->client->get(($url) ? $url : $this->getCallUrl());
 
             $context = json_decode($response->getBody()->getContents());
 
-            if (!$context->success) {
-                $this->error($context->message);
-                exit();
-            }
+            $this->checkSuccess($context);
 
             foreach ($context->data->data as $item) {
-                $article = $this->saveData($item);
+                $article = $this->clientArticleService->saveFromObject($item);
                 $this->info('Article saved with ID: ' . $article->id);
             }
 
@@ -88,30 +86,6 @@ class ArticleListCommand extends ArticleBase
     }
 
     /**
-     * @param \stdClass $data
-     * @return Article
-     */
-    private function saveData(\stdClass $data): Article
-    {
-        /** @var Article $article */
-        $article = Article::updateOrCreate(
-            ['slug' => $data->slug],
-            [
-                'title' => $data->title,
-                'description' => $data->content,
-                'reference_article_id' => $data->article_id,
-                'author_id' => $this->saveAuthor($data->author)->id,
-            ]
-        );
-
-        $categoriesIds = $this->saveCategories($data->categories);
-
-        $article->categories()->sync($categoriesIds);
-
-        return $article;
-    }
-
-    /**
      * @return string
      */
     protected function getCallUrl(): string
@@ -121,39 +95,4 @@ class ArticleListCommand extends ArticleBase
         ]);
     }
 
-    /**
-     * @param \stdClass $data
-     * @return Author
-     */
-    private function saveAuthor(\stdClass $data): Author
-    {
-        return Author::updateOrCreate(
-            ['reference_author_id' => $data->author_id],
-            [
-                'first_name' => $data->first_name,
-                'last_name' => $data->last_name,
-            ]
-        );
-    }
-
-    /**
-     * @param array $categories
-     * @return array
-     */
-    private function saveCategories(array $categories): array
-    {
-        $ids = [];
-
-        foreach ($categories as $category) {
-            $ids[] = Category::updateOrCreate(
-                ['reference_category_id' => $category->category_id],
-                [
-                    'title' => $category->title,
-                    'slug' => $category->slug,
-                ]
-            )->id;
-        }
-
-        return $ids;
-    }
 }

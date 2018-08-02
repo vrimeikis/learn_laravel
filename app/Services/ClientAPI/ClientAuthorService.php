@@ -34,10 +34,10 @@ class ClientAuthorService
     {
         return Author::updateOrCreate(
             [
-                'first_name' => $data->data->first_name,
-                'last_name' => $data->data->last_name,
+                'first_name' => $data->first_name,
+                'last_name' => $data->last_name,
             ],
-            ['reference_author_id' => $data->data->author_id]
+            ['reference_author_id' => $data->author_id]
         );
     }
 }

@@ -72,4 +72,15 @@ abstract class ArticleBase extends Command
             ':version' => $this->version,
         ]);
     }
+
+    /**
+     * @param \stdClass $data
+     */
+    protected function checkSuccess(\stdClass $data): void
+    {
+        if (!$data->success) {
+            $this->error($data->message);
+            exit();
+        }
+    }
 }

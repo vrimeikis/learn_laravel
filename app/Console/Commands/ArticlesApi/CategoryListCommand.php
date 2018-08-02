@@ -19,6 +19,7 @@ declare(strict_types = 1);
 namespace App\Console\Commands\ArticlesApi;
 
 use App\Category;
+use App\Services\ClientAPI\ClientCategoryService;
 use GuzzleHttp\Client;
 
 /**
@@ -40,6 +41,10 @@ class CategoryListCommand extends ArticleBase
      * @var string
      */
     protected $description = 'Get categories paginator list';
+    /**
+     * @var ClientCategoryService
+     */
+    private $clientCategoryService;
 
     /**
      * CategoryListCommand constructor.
@@ -47,31 +52,26 @@ class CategoryListCommand extends ArticleBase
     public function __construct()
     {
         parent::__construct();
+
+        $this->clientCategoryService = app()->make(ClientCategoryService::class);
     }
 
     /**
      * Execute the console command.
      *
      * @param string|null $url
-     * @return void
-     * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function handle(string $url = null): void
     {
         try {
-            $client = new Client();
-
-            $response = $client->get(($url) ? $url : $this->getCallUrl());
+            $response = $this->client->get(($url) ? $url : $this->getCallUrl());
 
             $result = json_decode($response->getBody()->getContents());
 
-            if (!$result->success) {
-                $this->error($result->message);
-                exit();
-            }
+            $this->checkSuccess($result);
 
             foreach ($result->data->data as $row) {
-                $category = $this->saveData($row);
+                $category = $this->clientCategoryService->saveFromObject($row);
                 $this->info('Category with slug: ' . $category->slug . ', updated or created successfully.');
             }
 
@@ -92,17 +92,5 @@ class CategoryListCommand extends ArticleBase
         return strtr(':url/category', [
             ':url' => parent::getCallUrl(),
         ]);
-    }
-
-    /**
-     * @param \stdClass $row
-     * @return Category
-     */
-    private function saveData(\stdClass $row): Category
-    {
-        return Category::updateOrCreate(
-            ['slug' => $row->slug],
-            ['title' => $row->title, 'reference_category_id' => $row->category_id]
-        );
     }
 }
