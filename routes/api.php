@@ -13,23 +13,19 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
+Route::middleware('auth:api')->get('/user', function(Request $request) {
     return $request->user();
 });
 
-Route::group(['prefix' => 'articles'], function () {
-    Route::get('/', 'API\\ArticleController@getPaginate');
-    Route::get('one/{articleId}', 'API\\ArticleController@getById');
-    Route::get('one/{articleId}/full', 'API\\ArticleController@getByIdFull');
-    Route::get('full', 'API\\ArticleController@getFullData');
+Route::group(['prefix' => 'v1'], function() {
+    Route::group(['prefix' => 'articles'], function() {
+        Route::get('/', 'API\\ArticleController@getPaginate');
+        Route::get('one/{articleId}', 'API\\ArticleController@getById');
+        Route::get('one/{articleId}/full', 'API\\ArticleController@getByIdFull');
+        Route::get('full', 'API\\ArticleController@getFullData');
+    });
+
+    Route::apiResource('categories', 'API\\CategoryController')->only(['index', 'show']);
+    Route::apiResource('author', 'API\\AuthorController')->only(['index', 'show']);
 });
 
-Route::group(['prefix' => 'categories'], function () {
-    Route::get('/', 'API\\CategoryController@getPaginate');
-    Route::get('one/{categoryId}', 'API\\CategoryController@getById');
-});
-
-Route::group(['prefix' => 'author'], function () {
-    Route::get('/', 'API\\AuthorController@getPaginate');
-    Route::get('one/{author}', 'API\\AuthorController@getById');
-});

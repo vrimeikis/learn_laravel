@@ -35,10 +35,10 @@ class AuthorService extends ApiService
      * @return LengthAwarePaginator
      * @throws \App\Exceptions\ApiDataException
      */
-    public function getPaginateData(int $page = 1): LengthAwarePaginator
+    public function getPaginateData(): LengthAwarePaginator
     {
         /** @var LengthAwarePaginator $authors */
-        $authors = Author::paginate(self::PER_PAGE, ['*'], 'page', $page);
+        $authors = Author::paginate();
 
         if ($authors->isEmpty()) {
             throw AuthorException::noData();

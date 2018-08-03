@@ -47,13 +47,12 @@ class AuthorController extends Controller
     }
 
     /**
-     * @param Request $request
      * @return JsonResponse
      */
-    public function getPaginate(Request $request): JsonResponse
+    public function index(): JsonResponse
     {
         try {
-            $authors = $this->authorService->getPaginateData((int)$request->page);
+            $authors = $this->authorService->getPaginateData();
 
             return response()->json([
                 'status' => true,
@@ -81,30 +80,20 @@ class AuthorController extends Controller
     }
 
     /**
-     * @param Request $request
-     * @param int $id Author ID
+     * @param int $author Author ID
      * @return AuthorDTO
      */
-    public function getById(Request $request, int $id): AuthorDTO
+    public function show(int $author): AuthorDTO
     {
         try {
-            return $this->authorService->getById($id);
+            return $this->authorService->getById($author);
         } catch (ModelNotFoundException $exception) {
-            logger($exception->getMessage(), [
-                'code' => $exception->getCode(),
-                'author-id' => $id,
-                'path' => $request->path(),
-                'url' => $request->url(),
-            ]);
-
             return response()->json([
                 'success' => false,
                 'message' => 'No data found.',
                 'code' => $exception->getCode(),
             ], JsonResponse::HTTP_NOT_FOUND);
         } catch (\Throwable $exception) {
-            dd($exception->getMessage());
-
             return response()->json([
                 'success' => false,
                 'message' => 'Something wrong.',

@@ -47,7 +47,7 @@ class CategoryController extends Controller
     /**
      * @return JsonResponse
      */
-    public function getPaginate(): JsonResponse
+    public function index(): JsonResponse
     {
         try {
             /** @var PaginatorDTO $categories */
@@ -70,7 +70,7 @@ class CategoryController extends Controller
             return response()->json(
                 [
                     'status' => false,
-                    'message' => 'Somethink wrong',
+                    'message' => 'Something wrong',
                     'code' => JsonResponse::HTTP_INTERNAL_SERVER_ERROR,
                 ],
                 JsonResponse::HTTP_INTERNAL_SERVER_ERROR
@@ -78,14 +78,18 @@ class CategoryController extends Controller
         }
     }
 
-    public function getById(int $categoryId): JsonResponse
+    /**
+     * @param int $category
+     * @return JsonResponse
+     */
+    public function show(int $category): JsonResponse
     {
         try {
-            $category = $this->categoryService->getById($categoryId);
+            $categoryData = $this->categoryService->getById($category);
 
             return response()->json([
                 'status' => true,
-                'data' => $category,
+                'data' => $categoryData,
             ]);
         } catch (\Throwable $exception) {
             return response()->json([
