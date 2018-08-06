@@ -62,7 +62,8 @@ class ArticleUpdateRequest extends ArticleStoreRequest
             ->where(
                 'id',
                 '!=',
-                $this->route()->parameter('article')->id
+                $this->article
+//                $this->route()->parameter('article')
             )
             ->get();
 

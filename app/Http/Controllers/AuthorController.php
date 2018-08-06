@@ -4,8 +4,8 @@ declare(strict_types = 1);
 
 namespace App\Http\Controllers;
 
-use App\Author;
 use App\Http\Requests\AuthorRequest;
+use App\Repositories\AuthorRepository;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -15,14 +15,27 @@ use Illuminate\View\View;
  */
 class AuthorController extends Controller
 {
+    private $authorRepository;
+
+    /**
+     * AuthorController constructor.
+     * @param AuthorRepository $authorRepository
+     */
+    public function __construct(AuthorRepository $authorRepository)
+    {
+        $this->authorRepository = $authorRepository;
+    }
+
+
     /**
      * Display a listing of the resource.
      *
      * @return View
+     * @throws \Exception
      */
     public function index(): View
     {
-        $authors = Author::all();
+        $authors = $this->authorRepository->paginate();
 
         return view('author.list', compact('authors'));
     }
@@ -42,10 +55,11 @@ class AuthorController extends Controller
      *
      * @param AuthorRequest $request
      * @return RedirectResponse
+     * @throws \Exception
      */
     public function store(AuthorRequest $request): RedirectResponse
     {
-        Author::create([
+        $this->authorRepository->create([
             'first_name' => $request->getFirstName(),
             'last_name' => $request->getLastName(),
         ]);
@@ -58,11 +72,14 @@ class AuthorController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Author $author
+     * @param int $authorId
      * @return View
+     * @throws \Exception
      */
-    public function edit(Author $author): View
+    public function edit(int $authorId): View
     {
+        $author = $this->authorRepository->find($authorId);
+
         return view('author.edit', compact('author'));
     }
 
@@ -70,14 +87,16 @@ class AuthorController extends Controller
      * Update the specified resource in storage.
      *
      * @param AuthorRequest $request
-     * @param  \App\Author $author
+     * @param int $authorId
      * @return RedirectResponse
+     * @throws \Exception
      */
-    public function update(AuthorRequest $request, Author $author): RedirectResponse
+    public function update(AuthorRequest $request, int $authorId): RedirectResponse
     {
-        $author->first_name = $request->getFirstName();
-        $author->last_name = $request->getLastName();
-        $author->save();
+        $this->authorRepository->update([
+            'first_name' => $request->getFirstName(),
+            'last_name' => $request->getLastName(),
+        ], $authorId);
 
         return redirect()
             ->route('author.index')
