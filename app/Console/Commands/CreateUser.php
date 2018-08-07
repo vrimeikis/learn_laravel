@@ -55,8 +55,9 @@ class CreateUser extends Command
      * Execute the console command.
      *
      * @return mixed
+     * @throws \Exception
      */
-    public function handle()
+    public function handle(): void
     {
         /** @var UserService $service */
         $service = app(UserService::class);
@@ -67,7 +68,7 @@ class CreateUser extends Command
             $this->getUserPassword()
         );
 
-        $this->info('Wohoo, User created!');
+        $this->info('Wohhoo, User created!');
     }
 
     /**

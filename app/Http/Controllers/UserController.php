@@ -20,9 +20,14 @@ namespace App\Http\Controllers;
 
 use App\Services\UserService;
 use App\User;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
+/**
+ * Class UserController
+ * @package App\Http\Controllers
+ */
 class UserController extends Controller
 {
     /**
@@ -44,9 +49,11 @@ class UserController extends Controller
      * Display a listing of the resource.
      *
      * @return View
+     * @throws \Exception
      */
     public function index(): View
     {
+        /** @var LengthAwarePaginator|User[] $users */
         $users = $this->userService->getPaginate();
 
         return view('user.list', compact('users'));

@@ -28,17 +28,18 @@
 
                             @foreach($categories as $category)
                                 <tr>
-                                    <td>{{ $category->id }}</td>
+                                    <td>{{ $category->id}}</td>
                                     <td>{{ $category->title }}</td>
                                     <td>{{ $category->slug }}</td>
                                     <td>
-                                        <a class="btn btn-sm btn-success" href="{{ route('category.edit', [$category->id]) }}">{{ __('Edit') }}</a>
+                                        <a class="btn btn-sm btn-success"
+                                           href="{{ route('category.edit', [$category->id]) }}">{{ __('Edit') }}</a>
                                     </td>
                                 </tr>
                             @endforeach
 
                         </table>
-
+                        {{ $categories->links() }}
                     </div>
                 </div>
             </div>

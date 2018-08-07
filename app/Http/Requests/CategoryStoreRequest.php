@@ -18,7 +18,7 @@ declare(strict_types = 1);
 
 namespace App\Http\Requests;
 
-use App\Category;
+use App\Repositories\CategoryRepository;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
@@ -72,10 +72,16 @@ class CategoryStoreRequest extends FormRequest
 
     /**
      * @return bool
+     * @throws \Exception
      */
     private function slugExists(): bool
     {
-        $category = Category::where('slug', '=', $this->getSlug())->first();
+        /** @var CategoryRepository $categoryRepository */
+        $categoryRepository = app(CategoryRepository::class);
+
+        $category = $categoryRepository->makeQuery()
+            ->where('slug', '=', $this->getSlug())
+            ->first();
 
         if (!empty($category)) {
             return true;
