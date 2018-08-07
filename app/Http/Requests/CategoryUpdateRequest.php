@@ -74,10 +74,10 @@ class CategoryUpdateRequest extends CategoryStoreRequest
         /** @var CategoryRepository $categoryRepository */
         $categoryRepository = app(CategoryRepository::class);
 
-        $category = $categoryRepository->makeQuery()
-            ->where('slug', '=', $this->getSlug())
-            ->where('id', '!=', $this->route()->parameter('category'))
-            ->first();
+        $category = $categoryRepository->getBySlugAndNotId(
+            $this->getSlug(),
+            (int)$this->route()->parameter('category')
+        );
 
         if (!empty($category)) {
             return true;

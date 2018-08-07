@@ -19,6 +19,7 @@ declare(strict_types = 1);
 namespace App\Repositories;
 
 use App\Category;
+use Illuminate\Database\Eloquent\Builder;
 
 /**
  * Class CategoryRepository
@@ -32,5 +33,42 @@ class CategoryRepository extends Repository
     public function model(): string
     {
         return Category::class;
+    }
+
+
+    /**
+     * @param string $slug
+     * @return Builder|\Illuminate\Database\Eloquent\Model|null|object
+     * @throws \Exception
+     */
+    public function getBySlug(string $slug)
+    {
+        return $this->getBySlugBuilder($slug)
+            ->first();
+    }
+
+
+    /**
+     * @param string $slug
+     * @param int $id
+     * @return Builder|\Illuminate\Database\Eloquent\Model|null|object
+     * @throws \Exception
+     */
+    public function getBySlugAndNotId(string $slug, int $id)
+    {
+        return $this->getBySlugBuilder($slug)
+            ->where('id', '!=', $id)
+            ->first();
+    }
+
+    /**
+     * @param string $slug
+     * @return Builder
+     * @throws \Exception
+     */
+    private function getBySlugBuilder(string $slug): Builder
+    {
+        return $this->makeQuery()
+            ->where('slug', $slug);
     }
 }

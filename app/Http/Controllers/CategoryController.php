@@ -110,7 +110,6 @@ class CategoryController extends Controller
      */
     public function update(CategoryUpdateRequest $request, int $categoryId): RedirectResponse
     {
-
         $this->categoryRepository->update([
             'title' => $request->getTitle(),
             'slug' => $request->getSlug(),

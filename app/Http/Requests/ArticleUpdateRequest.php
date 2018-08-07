@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Http\Requests;
 
-use App\Article;
+use App\Repositories\ArticleRepository;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Support\Str;
 
@@ -42,7 +42,7 @@ class ArticleUpdateRequest extends ArticleStoreRequest
     protected function getValidatorInstance(): Validator
     {
         $validator = parent::getValidatorInstance();
-        $validator->after(function (Validator $validator) {
+        $validator->after(function(Validator $validator) {
             if ($this->isMethod('put') && $this->slugExists()) {
                 $validator->errors()->add('slug', 'Slug already exists.');
 
@@ -55,23 +55,19 @@ class ArticleUpdateRequest extends ArticleStoreRequest
 
     /**
      * @return bool
+     * @throws \Exception
      */
     protected function slugExists(): bool
     {
-        $slug = Article::whereSlug($this->getSlug())
-            ->where(
-                'id',
-                '!=',
-                $this->article
-//                $this->route()->parameter('article')
-            )
-            ->get();
+        /** @var ArticleRepository $articleRepository */
+        $articleRepository = app(ArticleRepository::class);
 
-        if (!empty($slug->toArray())) {
-            return true;
-        }
+        $slug = $articleRepository->getBySlugAndNotId(
+            $this->getSlug(),
+            (int)$this->route()->parameter('article')
+        );
 
-        return false;
+        return !empty($slug);
     }
 
     /**

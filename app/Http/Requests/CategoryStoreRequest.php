@@ -79,9 +79,7 @@ class CategoryStoreRequest extends FormRequest
         /** @var CategoryRepository $categoryRepository */
         $categoryRepository = app(CategoryRepository::class);
 
-        $category = $categoryRepository->makeQuery()
-            ->where('slug', '=', $this->getSlug())
-            ->first();
+        $category = $categoryRepository->getBySlug($this->getSlug());
 
         if (!empty($category)) {
             return true;
