@@ -23,24 +23,38 @@ use App\DTO\CategoriesDTO;
 use App\DTO\CategoryDTO;
 use App\DTO\PaginatorDTO;
 use App\Exceptions\CategoryException;
-use App\Services\ApiService;
+use App\Repositories\CategoryRepository;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
  * Class CategoryService
  * @package App\Services\API
  */
-class CategoryService extends ApiService
+class CategoryService
 {
+    /**
+     * @var CategoryRepository
+     */
+    private $categoryRepository;
+
+    /**
+     * CategoryService constructor.
+     * @param CategoryRepository $categoryRepository
+     */
+    public function __construct(CategoryRepository $categoryRepository)
+    {
+        $this->categoryRepository = $categoryRepository;
+    }
+
     /**
      * @return PaginatorDTO
      * @throws \App\Exceptions\ApiDataException
-     * @throws CategoryException
+     * @throws \Exception
      */
     public function getPaginateDTOData(): PaginatorDTO
     {
         /** @var LengthAwarePaginator $categories */
-        $categories = Category::paginate(self::PER_PAGE);
+        $categories = $this->categoryRepository->paginate();
 
         if ($categories->isEmpty()) {
             throw CategoryException::noData();
@@ -70,11 +84,12 @@ class CategoryService extends ApiService
     /**
      * @param int $categoryId
      * @return CategoryDTO
+     * @throws \Exception
      */
     public function getById(int $categoryId): CategoryDTO
     {
         /** @var Category $category */
-        $category = Category::findOrFail($categoryId);
+        $category = $this->categoryRepository->findOrFail($categoryId);
 
         return new CategoryDTO($category->id, $category->title, $category->slug);
     }

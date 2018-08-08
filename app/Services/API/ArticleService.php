@@ -28,23 +28,36 @@ use App\DTO\CategoryDTO;
 use App\DTO\PaginatorDTO;
 use App\Exceptions\ArticleException;
 use App\Article;
-use App\Services\ApiService;
+use App\Repositories\ArticleRepository;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
  * Class ArticleService
  * @package App\Services\API
  */
-class ArticleService extends ApiService
+class ArticleService
 {
+    private $articleRepository;
+
+    /**
+     * ArticleService constructor.
+     * @param ArticleRepository $articleRepository
+     */
+    public function __construct(ArticleRepository $articleRepository)
+    {
+        $this->articleRepository = $articleRepository;
+    }
+
+
     /**
      * @return PaginatorDTO
      * @throws \App\Exceptions\ApiDataException
+     * @throws \Exception
      */
     public function getPaginateData(): PaginatorDTO
     {
         /** @var LengthAwarePaginator $articles */
-        $articles = Article::paginate(self::PER_PAGE);
+        $articles = $this->articleRepository->paginate();
 
         if ($articles->isEmpty()) {
             throw ArticleException::noData();
@@ -71,13 +84,15 @@ class ArticleService extends ApiService
     }
 
     /**
-     * @return LengthAwarePaginator
+     * @return PaginatorDTO
      * @throws \App\Exceptions\ApiDataException
+     * @throws \Exception
      */
     public function getFullData(): PaginatorDTO
     {
         /** @var LengthAwarePaginator $articles */
-        $articles = Article::with(['author', 'categories'])->paginate(self::PER_PAGE);
+        $articles = $this->articleRepository->with(['author', 'categories'])
+            ->paginate();
 
         if ($articles->isEmpty()) {
             throw ArticleException::noData();
@@ -121,11 +136,12 @@ class ArticleService extends ApiService
     /**
      * @param int $articleId
      * @return ArticleDTO
+     * @throws \Exception
      */
     public function getByIdForApi(int $articleId): ArticleDTO
     {
         /** @var Article $article */
-        $article = Article::findOrFail($articleId);
+        $article = $this->articleRepository->findOrFail($articleId);
 
         return new ArticleDTO($article->id, $article->title, $article->description);
     }
@@ -133,11 +149,13 @@ class ArticleService extends ApiService
     /**
      * @param int $articleId
      * @return ArticleFullDTO
+     * @throws \Exception
      */
     public function getFullByIdForApi(int $articleId): ArticleFullDTO
     {
         /** @var Article $article */
-        $article = Article::with('author', 'categories')->findOrFail($articleId);
+        $article = $this->articleRepository->with(['author', 'categories'])
+            ->findOrFail($articleId);
 
         // make ArticleDtTO object
         $articleDTO = new ArticleDTO($article->id, $article->title, $article->description);

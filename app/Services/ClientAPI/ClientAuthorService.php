@@ -19,6 +19,7 @@ declare(strict_types = 1);
 namespace App\Services\ClientAPI;
 
 use App\Author;
+use App\Repositories\AuthorRepository;
 
 /**
  * Class ClientAuthorService
@@ -29,10 +30,11 @@ class ClientAuthorService
     /**
      * @param \stdClass $data
      * @return Author
+     * @throws \Exception
      */
     public function saveAuthorFromObject(\stdClass $data): Author
     {
-        return Author::updateOrCreate(
+        return app(AuthorRepository::class)->updateOrCreate(
             [
                 'first_name' => $data->first_name,
                 'last_name' => $data->last_name,

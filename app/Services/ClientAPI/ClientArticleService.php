@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace App\Services\ClientAPI;
 
 use App\Article;
+use App\Repositories\ArticleRepository;
 
 /**
  * Class ClientArticleService
@@ -36,11 +37,12 @@ class ClientArticleService
     /**
      * @param \stdClass $data
      * @return Article
+     * @throws \Exception
      */
     public function saveFromObject(\stdClass $data): Article
     {
         /** @var Article $article */
-        $article = Article::updateOrCreate(
+        $article = app(ArticleRepository::class)->updateOrCreate(
             ['slug' => $data->slug],
             [
                 'title' => $data->title,

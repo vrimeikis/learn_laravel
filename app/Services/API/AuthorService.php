@@ -21,24 +21,39 @@ namespace App\Services\API;
 use App\Author;
 use App\DTO\AuthorDTO;
 use App\Exceptions\AuthorException;
-use App\Services\ApiService;
+use App\Repositories\AuthorRepository;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 /**
  * Class AuthorService
  * @package App\Services\API
  */
-class AuthorService extends ApiService
+class AuthorService
 {
     /**
-     * @param int $page
+     * @var AuthorRepository
+     */
+    private $authorRepository;
+
+    /**
+     * AuthorService constructor.
+     * @param AuthorRepository $authorRepository
+     */
+    public function __construct(AuthorRepository $authorRepository)
+    {
+        $this->authorRepository = $authorRepository;
+    }
+
+
+    /**
      * @return LengthAwarePaginator
      * @throws \App\Exceptions\ApiDataException
+     * @throws \Exception
      */
     public function getPaginateData(): LengthAwarePaginator
     {
         /** @var LengthAwarePaginator $authors */
-        $authors = Author::paginate();
+        $authors = $this->authorRepository->paginate();
 
         if ($authors->isEmpty()) {
             throw AuthorException::noData();
@@ -47,10 +62,15 @@ class AuthorService extends ApiService
         return $authors;
     }
 
+    /**
+     * @param int $authorId
+     * @return AuthorDTO
+     * @throws \Exception
+     */
     public function getById(int $authorId): AuthorDTO
     {
         /** @var Author $author */
-        $author = Author::findOrFail($authorId);
+        $author = $this->authorRepository->findOrFail($authorId);
 
         $dto = new AuthorDTO();
 

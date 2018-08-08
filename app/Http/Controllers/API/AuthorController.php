@@ -23,7 +23,6 @@ use App\Exceptions\AuthorException;
 use App\Services\API\AuthorService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
 /**

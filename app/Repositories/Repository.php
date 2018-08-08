@@ -99,6 +99,27 @@ abstract class Repository implements RepositoryContract
     }
 
     /**
+     * @param int $id
+     * @return Model
+     * @throws \Exception
+     */
+    public function findOrFail(int $id): Model
+    {
+        return $this->makeQuery()->findOrFail($id);
+    }
+
+    /**
+     * @param array $criteria
+     * @param array $data
+     * @return Model
+     * @throws \Exception
+     */
+    public function updateOrCreate(array $criteria, array $data): Model
+    {
+        return $this->makeQuery()->updateOrCreate($criteria, $data);
+    }
+
+    /**
      * @param array $relations
      * @return Builder
      * @throws \Exception

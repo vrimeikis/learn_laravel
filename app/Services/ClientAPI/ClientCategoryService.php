@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace App\Services\ClientAPI;
 
 use App\Category;
+use App\Repositories\CategoryRepository;
 
 /**
  * Class ClientCategoryService
@@ -15,10 +16,11 @@ class ClientCategoryService
     /**
      * @param \stdClass $data
      * @return Category
+     * @throws \Exception
      */
     public function saveFromObject(\stdClass $data): Category
     {
-        return Category::updateOrCreate(
+        return app(CategoryRepository::class)->updateOrCreate(
             ['slug' => $data->slug],
             [
                 'title' => $data->title,
@@ -30,6 +32,7 @@ class ClientCategoryService
     /**
      * @param array $categories
      * @return array
+     * @throws \Exception
      */
     public function getIdsFromObjects(array $categories = []): array
     {
