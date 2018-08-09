@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property string $title
+ * @property string|null $cover
  * @property string $description
  * @property string $slug
  * @property int|null $author_id
@@ -26,6 +27,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property int|null $reference_article_id
  * @property-read Collection|Category[] $categories
  * @method static Builder|Article whereAuthorId($value)
+ * @method static Builder|Article whereCover($value)
  * @method static Builder|Article whereCreatedAt($value)
  * @method static Builder|Article whereDescription($value)
  * @method static Builder|Article whereId($value)
@@ -42,6 +44,7 @@ class Article extends Model
      */
     protected $fillable = [
         'title',
+        'cover',
         'description',
         'slug',
         'author_id',

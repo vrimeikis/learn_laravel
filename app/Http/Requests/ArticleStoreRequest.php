@@ -7,6 +7,7 @@ namespace App\Http\Requests;
 use App\Repositories\ArticleRepository;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 
 /**
@@ -34,6 +35,7 @@ class ArticleStoreRequest extends FormRequest
     {
         return [
             'title' => 'required|min:3|max:191|string',
+            'cover' => 'nullable|image|max:2048|min:100|dimensions:min_width=600,min_height=300',
             'description' => 'required',
             'author_id' => 'required|exists:authors,id',
             'category' => [
@@ -115,5 +117,13 @@ class ArticleStoreRequest extends FormRequest
     public function getCategoriesIds(): array
     {
         return $this->input('category', []);
+    }
+
+    /**
+     * @return UploadedFile|null
+     */
+    public function getCover(): ? UploadedFile
+    {
+        return $this->file('cover');
     }
 }

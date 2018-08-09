@@ -23,6 +23,15 @@
                                 <td>{{ $article->title }}</td>
                             </tr>
                             <tr>
+                                <td>{{ __('Cover') }}</td>
+                                <td>
+                                    @if ($article->cover)
+                                        <br>
+                                        <img width="300" src="{{ Storage::url($article->cover) }}">
+                                    @endif
+                                </td>
+                            </tr>
+                            <tr>
                                 <td>{{ __('Description') }}:</td>
                                 <td>{{ $article->description }}</td>
                             </tr>

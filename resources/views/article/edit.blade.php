@@ -17,7 +17,7 @@
                             </div>
                         @endif
 
-                        <form action="{{ route('article.update', [$article->id]) }}" method="post">
+                        <form action="{{ route('article.update', [$article->id]) }}" method="post" enctype="multipart/form-data">
 
                             {{ method_field('put') }}
 
@@ -29,6 +29,18 @@
                                        value="{{ old('title', $article->title) }}">
                                 @if($errors->has('title'))
                                     <div class="alert-danger">{{ $errors->first('title') }}</div>
+                                @endif
+                            </div>
+
+                            <div class="form-group">
+                                <label for="cover">{{ __('Cover') }}</label>
+                                @if ($article->cover)
+                                    <br>
+                                    <img width="200" src="{{ Storage::url($article->cover) }}">
+                                @endif
+                                <input id="cover" class="form-control" type="file" name="cover" accept=".jpg, .jpeg, .png">
+                                @if($errors->has('cover'))
+                                    <div class="alert-danger">{{ $errors->first('cover') }}</div>
                                 @endif
                             </div>
 

@@ -17,7 +17,7 @@
                             </div>
                         @endif
 
-                        <form action="{{ route('article.store') }}" method="post">
+                        <form action="{{ route('article.store') }}" method="post" enctype="multipart/form-data">
 
                             {{ csrf_field() }}
 
@@ -27,6 +27,14 @@
                                        value="{{ old('title') }}">
                                 @if($errors->has('title'))
                                     <div class="alert-danger">{{ $errors->first('title') }}</div>
+                                @endif
+                            </div>
+
+                            <div class="form-group">
+                                <label for="cover">{{ __('Cover') }}</label>
+                                <input id="cover" class="form-control" type="file" name="cover" accept=".jpg, .jpeg, .png">
+                                @if($errors->has('cover'))
+                                    <div class="alert-danger">{{ $errors->first('cover') }}</div>
                                 @endif
                             </div>
 
@@ -51,8 +59,6 @@
                                     @endforeach
                                 </select>
 
-                                {{--<input id="author" class="form-control" type="text" name="author"--}}
-                                {{--value="{{ old('author') }}">--}}
                                 @if($errors->has('author_id'))
                                     <div class="alert-danger">{{ $errors->first('author_id') }}</div>
                                 @endif

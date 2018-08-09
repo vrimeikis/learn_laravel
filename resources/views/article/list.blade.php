@@ -27,6 +27,7 @@
                         <table class="table">
                             <tr>
                                 <th>ID</th>
+                                <th>Cover</th>
                                 <th>Title</th>
                                 <th>Slug</th>
                                 <th>Actions</th>
@@ -35,6 +36,11 @@
                             @foreach($articles as $article)
                                 <tr>
                                     <td>{{ $article->id }}</td>
+                                    <td>
+                                        @if ($article->cover)
+                                            <img width="100" src="{{ Storage::url($article->cover) }}">
+                                        @endif
+                                    </td>
                                     <td>{{ $article->title }}</td>
                                     <td>{{ $article->slug }}</td>
                                     <td>

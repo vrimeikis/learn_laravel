@@ -21,6 +21,8 @@ use Illuminate\View\View;
  */
 class ArticleController extends Controller
 {
+    const COVER_DIRECTORY = 'articles';
+
     /**
      * @var ArticleRepository
      */
@@ -93,6 +95,7 @@ class ArticleController extends Controller
     {
         $data = [
             'title' => $request->getTitle(),
+            'cover' => $request->getCover() ? $request->getCover()->store(self::COVER_DIRECTORY) : null,
             'description' => $request->getDescription(),
             'author_id' => $request->getAuthorId(),
             'slug' => $request->getSlug(),
@@ -150,12 +153,19 @@ class ArticleController extends Controller
     public function update(ArticleUpdateRequest $request, int $articleId): RedirectResponse
     {
 
-        $this->articleRepository->update([
+        $data = [
             'title' => $request->getTitle(),
             'description' => $request->getDescription(),
             'author_id' => $request->getAuthorId(),
             'slug' => $request->getSlug(),
-        ], $articleId);
+        ];
+
+        if ($request->getCover()) {
+
+            $data['cover'] = $request->getCover()->store(self::COVER_DIRECTORY);
+        }
+
+        $this->articleRepository->update($data, $articleId);
 
         /** @var Article $article */
         $article = $this->articleRepository->find($articleId);
