@@ -17,7 +17,10 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::get('home', 'HomeController@index')->name('home');
+
+Route::get('contacts', 'Front\\ContactController@index')->name('contacts');
+Route::post('contacts', 'Front\\ContactController@sendMessage');
 
 Route::resource('article', 'ArticleController');
 
