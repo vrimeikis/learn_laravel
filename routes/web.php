@@ -11,21 +11,21 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
 Auth::routes();
 
-Route::get('home', 'HomeController@index')->name('home');
+Route::get('/', 'Front\\HomeController@index')->name('home');
 
 Route::get('contacts', 'Front\\ContactController@index')->name('contacts');
 Route::post('contacts', 'Front\\ContactController@sendMessage');
 
-Route::resource('article', 'ArticleController');
+Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function() {
 
-Route::group(['middleware' => ['auth']], function () {
+    Route::get('/', 'AdminController@index')->name('admin.home');
+
+    Route::resource('article', 'ArticleController');
+
     Route::resource('author', 'AuthorController')->except(['show', 'destroy']);
     Route::resource('category', 'CategoryController')->except(['show', 'destroy']);
     Route::resource('user', 'UserController')->only(['index']);
+
 });
