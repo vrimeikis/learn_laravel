@@ -77,6 +77,53 @@ class CategoryRepositoryTest extends TestCase
     }
 
     /**
+     * @test
+     * @throws \Exception
+     */
+    public function it_should_return_null_by_slug_and_not_id_empty_table(): void
+    {
+        $slug = str_random(10);
+        $id = mt_rand(1, 10);
+
+        $this->assertNull($this->getTestClassInstance()->getBySlugAndNotId($slug, $id));
+    }
+
+    /**
+     * @test
+     * @throws \Exception
+     */
+    public function it_should_return_null_by_slug_and_not_id_not_empty_table(): void
+    {
+        factory(Category::class)->create();
+
+        /** @var Category $category */
+        $category = factory(Category::class)->create();
+
+        factory(Category::class)->create();
+
+        $this->assertNull($this->getTestClassInstance()->getBySlugAndNotId($category->slug, $category->id));
+    }
+
+    /**
+     * @test
+     * @throws \Exception
+     */
+    public function it_should_return_row_by_slug_and_not_id(): void
+    {
+        /** @var Category $category1 */
+        $category1 = factory(Category::class)->create([
+            'reference_category_id' => null,
+        ]);
+        /** @var Category $category2 */
+        $category2 = factory(Category::class)->create();
+
+        $result = $this->getTestClassInstance()->getBySlugAndNotId($category1->slug, $category2->id);
+
+        $this->assertInstanceOf(Category::class, $result);
+        $this->assertEquals($category1->toArray(), $result->toArray());
+    }
+
+    /**
      * @return CategoryRepository
      */
     private function getTestClassInstance(): CategoryRepository
