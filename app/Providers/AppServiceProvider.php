@@ -8,6 +8,7 @@ use App\Repositories\CategoryRepository;
 use App\Repositories\UserRepository;
 use App\Services\API\ArticleService;
 use App\Services\API\AuthorService;
+use App\Services\API\CategoryService;
 use App\Services\ClientAPI\ClientArticleService;
 use App\Services\ClientAPI\ClientAuthorService;
 use App\Services\ClientAPI\ClientCategoryService;
@@ -49,6 +50,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(ArticleService::class);
         $this->app->singleton(AuthorService::class);
+        $this->app->singleton(CategoryService::class);
         $this->app->singleton(UserService::class);
 
         $this->app->singleton(ClientAuthorService::class);
