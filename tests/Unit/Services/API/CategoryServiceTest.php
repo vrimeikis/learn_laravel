@@ -23,10 +23,11 @@ use App\DTO\CategoriesDTO;
 use App\DTO\CategoryDTO;
 use App\DTO\PaginatorDTO;
 use App\Exceptions\CategoryException;
+use App\Repositories\CategoryRepository;
 use App\Services\API\CategoryService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
-use Tests\MemoryDatabaseMigrations;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -37,8 +38,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
  */
 class CategoryServiceTest extends TestCase
 {
-    use MemoryDatabaseMigrations;
-
     /**
      * @test
      * @group category
@@ -55,9 +54,15 @@ class CategoryServiceTest extends TestCase
      * @group category
      * @group category-service
      * @throws \App\Exceptions\ApiDataException
+     * @throws \ReflectionException
      */
     public function it_should_fail_on_paginate_data(): void
     {
+        $this->initPHPUnitMock(CategoryRepository::class, null, ['paginate'])
+            ->expects($this->once())
+            ->method('paginate')
+            ->willReturn(new LengthAwarePaginator(null, 0, 15));
+
         $this->expectException(CategoryException::class);
         $this->expectExceptionMessage(CategoryException::noData()->getMessage());
         $this->expectExceptionCode(CategoryException::noData()->getCode());
@@ -70,11 +75,22 @@ class CategoryServiceTest extends TestCase
      * @group category
      * @group category-service
      * @throws \App\Exceptions\ApiDataException
+     * @throws \ReflectionException
      */
     public function it_should_get_paginator_dto_data(): void
     {
+        $count = 5;
+
         /** @var Collection|Category[] $categories */
-        $categories = factory(Category::class, 2)->create();
+        $categories = factory(Category::class, $count)->make()
+            ->each(function(Category $item, $key) {
+                $item->id = $key + 1;
+            });
+
+        $this->initPHPUnitMock(CategoryRepository::class, null, ['paginate'])
+            ->expects($this->once())
+            ->method('paginate')
+            ->willReturn(new LengthAwarePaginator($categories, $count, 15));
 
         $expectData = new CategoriesDTO();
 
@@ -105,6 +121,12 @@ class CategoryServiceTest extends TestCase
     {
         $id = mt_rand(1, 10);
 
+        $this->initPHPUnitMock(CategoryRepository::class, null, ['findOrFail'])
+            ->expects($this->once())
+            ->method('findOrFail')
+            ->with($id)
+            ->willThrowException(new ModelNotFoundException());
+
         $this->expectException(ModelNotFoundException::class);
 
         $this->getTestClassInstance()->getById($id);
@@ -119,7 +141,15 @@ class CategoryServiceTest extends TestCase
     public function it_should_return_category_dto_by_id(): void
     {
         /** @var Category $category */
-        $category = factory(Category::class)->create();
+        $category = factory(Category::class)->make([
+            'id' => mt_rand(1, 10),
+        ]);
+
+        $this->initPHPUnitMock(CategoryRepository::class, null, ['findOrFail'])
+            ->expects($this->once())
+            ->method('findOrFail')
+            ->with($category->id)
+            ->willReturn($category);
 
         $expectData = new CategoryDTO($category->id, $category->title, $category->slug);
 

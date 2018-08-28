@@ -91,10 +91,11 @@ class ArticleService
     public function getFullData(): PaginatorDTO
     {
         /** @var LengthAwarePaginator $articles */
-        $articles = $this->articleRepository->with(['author', 'categories'])
-            ->paginate();
-
-        if ($articles->isEmpty()) {
+        $query = $this->articleRepository
+            ->with(['author', 'categories']);
+        $articles = $query->paginate();
+dd($articles);
+        if (is_null($articles) || $articles->isEmpty()) {
             throw ArticleException::noData();
         }
 
