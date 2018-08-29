@@ -19,7 +19,10 @@ declare(strict_types = 1);
 namespace App\Repositories;
 
 use App\Article;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Query\JoinClause;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class ArticleRepository
@@ -59,6 +62,26 @@ class ArticleRepository extends Repository
         return $this->getBySlugBuilder($slug)
             ->where('id', '!=', $id)
             ->first();
+    }
+
+    /**
+     * @return LengthAwarePaginator
+     */
+    public function getFullData(): LengthAwarePaginator
+    {
+        $articles = DB::table('articles')->paginate();
+
+        foreach ($articles as $article) {
+            $article->author = DB::table('authors')->find($article->author_id);
+            $article->categories = DB::table('categories')
+                ->join('article_category', function(JoinClause $q) use ($article) {
+                    $q->on('categories.id', '=', 'article_category.category_id')
+                        ->where('article_category.article_id', '=', $article->id);
+                })
+                ->get(['categories.*']);
+        }
+
+        return $articles;
     }
 
     /**

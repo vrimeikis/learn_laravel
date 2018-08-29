@@ -19,7 +19,10 @@ declare(strict_types = 1);
 namespace Tests\Unit\Repositories;
 
 use App\Article;
+use App\Category;
 use App\Repositories\ArticleRepository;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use Tests\MemoryDatabaseMigrations;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -120,6 +123,60 @@ class ArticleRepositoryTest extends TestCase
 
         $this->assertInstanceOf(Article::class, $result);
         $this->assertEquals($article1->toArray(), $result->toArray());
+    }
+
+    /**
+     * @test
+     * @group article
+     * @group article-repository
+     */
+    public function it_should_return_empty_paginator(): void
+    {
+        $result = $this->getTestClassInstance()->getFullData();
+
+        $this->assertInstanceOf(LengthAwarePaginator::class, $result);
+        $this->assertTrue($result->isEmpty());
+    }
+
+    /**
+     * @test
+     * @group article
+     * @group article-repository
+     */
+    public function it_should_return_paginator_with_data(): void
+    {
+        /** @var Collection|Article[] $articles */
+        $articles = factory(Article::class, 5)->create()
+            ->each(function(Article $article) {
+                $article->categories()
+                    ->sync(factory(Category::class, 2)->create()->pluck('id')->all());
+            });
+
+        $expectedData = [];
+
+        $articles->each(function(Article $article) use (&$expectedData) {
+            $item = $article->toArray();
+
+            array_set($item, 'author', (object)$article->author->toArray());
+
+            $categories = collect();
+
+            $article->categories->each(function(Category $category) use ($categories) {
+                $cat = $category->toArray();
+                array_forget($cat, 'pivot');
+                $categories->push((object)$cat);
+            });
+
+            array_set($item, 'categories', $categories);
+
+            array_push($expectedData, (object)$item);
+        });
+
+        $result = $this->getTestClassInstance()->getFullData();
+
+        $this->assertInstanceOf(LengthAwarePaginator::class, $result);
+        $this->assertTrue($result->isNotEmpty());
+        $this->assertEquals($expectedData, $result->items());
     }
 
     /**

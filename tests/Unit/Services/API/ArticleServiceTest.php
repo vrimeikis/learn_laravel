@@ -119,70 +119,97 @@ class ArticleServiceTest extends TestCase
         );
     }
 
-//    /**
-//     * @test
-//     * @group article
-//     * @group article-service1
-//     * @throws \App\Exceptions\ApiDataException
-//     * @throws \ReflectionException
-//     */
-//    public function it_should_expect_exception_on_full_data_pagination(): void
-//    {
-//        $this->initPHPUnitMock(ArticleRepository::class, null, ['with', 'paginate'])
-//            ->expects($this->once())
-//            ->method('paginate')
-//            ->willReturn(new LengthAwarePaginator(null, 0, 15));
-//
-//        $this->expectException(ArticleException::class);
-//        $this->expectExceptionMessage(ArticleException::noData()->getMessage());
-//        $this->expectExceptionCode(ArticleException::noData()->getCode());
-//
-//        $this->getTestClassInstance()->getFullData();
-//    }
+    /**
+     * @test
+     * @group article
+     * @group article-service1
+     * @throws \App\Exceptions\ApiDataException
+     * @throws \ReflectionException
+     */
+    public function it_should_expect_exception_on_full_data_pagination(): void
+    {
+        $this->initPHPUnitMock(ArticleRepository::class, null, ['getFullData'])
+            ->expects($this->once())
+            ->method('getFullData')
+            ->willReturn(new LengthAwarePaginator(null, 0, 15));
 
-//    /**
-//     * @test
-//     * @group article
-//     * @group article-service
-//     * @throws \App\Exceptions\ApiDataException
-//     */
-//    public function it_should_return_paginator_dto_with_data_on_full_without_categories(): void
-//    {
-//        /** @var Collection|Article[] $articles */
-//        $articles = factory(Article::class, 2)->create();
-//
-//        $expectedData = new ArticlesDTO();
-//
-//        $articles->each(function(Article $article) use (&$expectedData) {
-//            $articleDTO = new ArticleDTO($article->id, $article->title, $article->description);
-//
-//            $author = $article->author;
-//            $authorDTO = (new AuthorDTO())
-//                ->setAuthorId($author->id)
-//                ->setFirstName($author->first_name)
-//                ->setLastName($author->last_name);
-//
-//            $categoriesDTO = new CategoriesDTO();
-//
-//            $expectedData->setArticle(
-//                new ArticleFullDTO(
-//                    $articleDTO,
-//                    $authorDTO,
-//                    $categoriesDTO
-//                )
-//            );
-//        });
-//
-//        $result = $this->getTestClassInstance()->getFullData();
-//
-//        $this->assertInstanceOf(PaginatorDTO::class, $result);
-//
-//        $this->assertEquals(
-//            collect($expectedData)->get('data'),
-//            collect($result)->get('data')
-//        );
-//    }
-//
+        $this->expectException(ArticleException::class);
+        $this->expectExceptionMessage(ArticleException::noData()->getMessage());
+        $this->expectExceptionCode(ArticleException::noData()->getCode());
+
+        $this->getTestClassInstance()->getFullData();
+    }
+
+    /**
+     * @test
+     * @group article
+     * @group article-service
+     * @throws \App\Exceptions\ApiDataException
+     * @throws \ReflectionException
+     */
+    public function it_should_return_paginator_dto_with_data_on_full_without_categories(): void
+    {
+        /** @var Author $author */
+        $author = factory(Author::class)->make([
+            'id' => mt_rand(1, 10),
+        ]);
+
+        /** @var Collection|Article[] $articles */
+        $articles = factory(Article::class, 2)->make([
+            'author_id' => $author->id,
+        ])->each(function(Article $article, $key) {
+            $article->id = $key + 1;
+        });
+
+        $mockData = [];
+
+        $articles->each(function(Article $article) use (&$mockData, $author) {
+
+            $item = $article->toArray();
+
+            array_set($item, 'author', (object)$author->toArray());
+            array_set($item, 'categories', collect());
+
+            array_push($mockData, (object)$item);
+        });
+
+
+        $this->initPHPUnitMock(ArticleRepository::class, null, ['getFullData'])
+            ->expects($this->once())
+            ->method('getFullData')
+            ->willReturn(new LengthAwarePaginator($mockData, 2, 15));
+
+        $expectedData = new ArticlesDTO();
+
+        $articles->each(function(Article $article) use (&$expectedData, $author) {
+            $articleDTO = new ArticleDTO($article->id, $article->title, $article->description);
+
+            $authorDTO = (new AuthorDTO())
+                ->setAuthorId($author->id)
+                ->setFirstName($author->first_name)
+                ->setLastName($author->last_name);
+
+            $categoriesDTO = new CategoriesDTO();
+
+            $expectedData->setArticle(
+                new ArticleFullDTO(
+                    $articleDTO,
+                    $authorDTO,
+                    $categoriesDTO
+                )
+            );
+        });
+
+        $result = $this->getTestClassInstance()->getFullData();
+
+        $this->assertInstanceOf(PaginatorDTO::class, $result);
+
+        $this->assertEquals(
+            collect($expectedData)->get('data'),
+            collect($result)->get('data')
+        );
+    }
+
 //    /**
 //     * @test
 //     * @group article

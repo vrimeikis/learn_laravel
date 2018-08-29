@@ -37,5 +37,6 @@ $factory->define(Article::class, function(Faker $faker) {
         'author_id' => function() {
             return factory(Author::class)->create();
         },
+        'reference_article_id' => null,
     ];
 });
