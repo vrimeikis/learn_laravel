@@ -210,92 +210,143 @@ class ArticleServiceTest extends TestCase
         );
     }
 
-//    /**
-//     * @test
-//     * @group article
-//     * @group article-service
-//     * @throws \App\Exceptions\ApiDataException
-//     */
-//    public function it_should_return_paginator_dto_with_data_on_full_with_categories(): void
-//    {
-//        /** @var Collection|Article[] $articles */
-//        $articles = factory(Article::class, 2)->create()
-//            ->each(function(Article $item) {
-//                $item->categories()->saveMany(factory(Category::class, 3)->make());
-//            });
-//
-//        $expectedData = new ArticlesDTO();
-//
-//        $articles->each(function(Article $article) use (&$expectedData) {
-//            $articleDTO = new ArticleDTO($article->id, $article->title, $article->description);
-//
-//            $author = $article->author;
-//            $authorDTO = (new AuthorDTO())
-//                ->setAuthorId($author->id)
-//                ->setFirstName($author->first_name)
-//                ->setLastName($author->last_name);
-//
-//            $categoriesDTO = new CategoriesDTO();
-//
-//            $categories = $article->categories;
-//            $categories->each(function(Category $category) use (&$categoriesDTO) {
-//                $categoriesDTO->setCategoryData(new CategoryDTO(
-//                    $category->id,
-//                    $category->title,
-//                    $category->slug
-//                ));
-//            });
-//
-//            $expectedData->setArticle(
-//                new ArticleFullDTO(
-//                    $articleDTO,
-//                    $authorDTO,
-//                    $categoriesDTO
-//                )
-//            );
-//        });
-//
-//        $result = $this->getTestClassInstance()->getFullData();
-//
-//        $this->assertInstanceOf(PaginatorDTO::class, $result);
-//
-//        $this->assertEquals(
-//            collect($expectedData)->get('data'),
-//            collect($result)->get('data')
-//        );
-//    }
-//
-//    /**
-//     * @test
-//     * @group article
-//     * @group article-service
-//     * @throws \Exception
-//     */
-//    public function it_should_expect_not_found_exception_by_id(): void
-//    {
-//        $id = mt_rand(1, 10);
-//
-//        $this->expectException(ModelNotFoundException::class);
-//
-//        $this->getTestClassInstance()->getByIdForApi($id);
-//    }
-//
-//    /**
-//     * @test
-//     * @group article
-//     * @group article->service
-//     * @throws \Exception
-//     */
-//    public function it_should_return_article_dto_by_id(): void
-//    {
-//        /** @var Article $article */
-//        $article = factory(Article::class)->create();
-//
-//        $result = $this->getTestClassInstance()->getByIdForApi($article->id);
-//
-//        $this->assertEquals(new ArticleDTO($article->id, $article->title, $article->description), $result);
-//    }
-//
+    /**
+     * @test
+     * @group article
+     * @group article-service
+     * @throws \App\Exceptions\ApiDataException
+     * @throws \ReflectionException
+     */
+    public function it_should_return_paginator_dto_with_data_on_full_with_categories(): void
+    {
+        /** @var Author $author */
+        $author = factory(Author::class)->make([
+            'id' => mt_rand(1, 10),
+        ]);
+
+        /** @var Collection|Category[] $categories */
+        $categories = factory(Category::class, 2)->make()
+            ->each(function(Category $category, $key) {
+                $category->id = $key + 1;
+            });
+
+        /** @var Collection|Article[] $articles */
+        $articles = factory(Article::class, 2)->make([
+            'author_id' => $author->id,
+        ])->each(function(Article $article, $key) {
+            $article->id = $key + 1;
+        });
+
+        $mockData = [];
+
+        $articles->each(function(Article $article) use (&$mockData, $author, $categories) {
+
+            $item = $article->toArray();
+
+            array_set($item, 'author', (object)$author->toArray());
+
+            $cats = collect();
+
+            $categories->each(function(Category $category) use ($cats) {
+                $cats->push((object)$category->toArray());
+            });
+
+            array_set($item, 'categories', $cats);
+
+            array_push($mockData, (object)$item);
+        });
+
+
+        $this->initPHPUnitMock(ArticleRepository::class, null, ['getFullData'])
+            ->expects($this->once())
+            ->method('getFullData')
+            ->willReturn(new LengthAwarePaginator($mockData, 2, 15));
+
+        $expectedData = new ArticlesDTO();
+
+        $articles->each(function(Article $article) use (&$expectedData, $author, $categories) {
+            $articleDTO = new ArticleDTO($article->id, $article->title, $article->description);
+
+            $authorDTO = (new AuthorDTO())
+                ->setAuthorId($author->id)
+                ->setFirstName($author->first_name)
+                ->setLastName($author->last_name);
+
+            $categoriesDTO = new CategoriesDTO();
+
+            $categories->each(function(Category $category) use ($categoriesDTO) {
+                $categoriesDTO->setCategoryData(
+                    new CategoryDTO($category->id, $category->title, $category->slug)
+                );
+            });
+
+            $expectedData->setArticle(
+                new ArticleFullDTO(
+                    $articleDTO,
+                    $authorDTO,
+                    $categoriesDTO
+                )
+            );
+        });
+
+        $result = $this->getTestClassInstance()->getFullData();
+
+        $this->assertInstanceOf(PaginatorDTO::class, $result);
+
+        $this->assertEquals(
+            collect($expectedData)->get('data'),
+            collect($result)->get('data')
+        );
+    }
+
+    /**
+     * @test
+     * @group article
+     * @group article-service
+     * @throws \Exception
+     */
+    public function it_should_expect_not_found_exception_by_id(): void
+    {
+        $id = mt_rand(1, 10);
+
+        $this->initPHPUnitMock(ArticleRepository::class, null, ['findOrFail'])
+            ->expects($this->once())
+            ->method('findOrFail')
+            ->with($id)
+            ->willThrowException(new ModelNotFoundException());
+
+        $this->expectException(ModelNotFoundException::class);
+
+        $this->getTestClassInstance()->getByIdForApi($id);
+    }
+
+    /**
+     * @test
+     * @group article
+     * @group article-service
+     * @throws \Exception
+     */
+    public function it_should_return_article_dto_by_id(): void
+    {
+        /** @var Article $article */
+        $article = factory(Article::class)->make([
+            'id' => mt_rand(1, 10),
+            'author_id' => mt_rand(1, 100),
+        ]);
+
+        $this->initPHPUnitMock(ArticleRepository::class, null, ['findOrFail'])
+            ->expects($this->once())
+            ->method('findOrFail')
+            ->with($article->id)
+            ->willReturn($article);
+
+        $result = $this->getTestClassInstance()->getByIdForApi($article->id);
+
+        $this->assertEquals(new ArticleDTO($article->id, $article->title, $article->description), $result);
+    }
+
+
+    // todo: refactor repository function without relations
 //    /**
 //     * @test
 //     * @group article
