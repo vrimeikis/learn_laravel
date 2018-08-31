@@ -22,6 +22,7 @@ use App\Article;
 use App\Category;
 use App\Repositories\ArticleRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Collection;
 use Tests\MemoryDatabaseMigrations;
 use Tests\TestCase;
@@ -142,6 +143,36 @@ class ArticleRepositoryTest extends TestCase
      * @test
      * @group article
      * @group article-repository
+     * @throws \Exception
+     */
+    public function it_should_return_paginator_with_data_without_categories(): void
+    {
+        /** @var Collection|Article[] $articles */
+        $articles = factory(Article::class, 5)->create();
+
+        $expectedData = [];
+
+        $articles->each(function(Article $article) use (&$expectedData) {
+            $item = $article->toArray();
+
+            array_set($item, 'author', $article->author->toArray());
+            array_set($item, 'categories', []);
+
+            array_push($expectedData, $item);
+        });
+
+        $result = $this->getTestClassInstance()->getFullData();
+
+        $this->assertInstanceOf(LengthAwarePaginator::class, $result);
+        $this->assertTrue($result->isNotEmpty());
+        $this->assertEquals($expectedData, collect($result->items())->toArray());
+    }
+
+    /**
+     * @test
+     * @group article
+     * @group article-repository
+     * @throws \Exception
      */
     public function it_should_return_paginator_with_data(): void
     {
@@ -157,26 +188,82 @@ class ArticleRepositoryTest extends TestCase
         $articles->each(function(Article $article) use (&$expectedData) {
             $item = $article->toArray();
 
-            array_set($item, 'author', (object)$article->author->toArray());
+            array_set($item, 'author', $article->author->toArray());
+            array_set($item, 'categories', $article->categories->toArray());
 
-            $categories = collect();
-
-            $article->categories->each(function(Category $category) use ($categories) {
-                $cat = $category->toArray();
-                array_forget($cat, 'pivot');
-                $categories->push((object)$cat);
-            });
-
-            array_set($item, 'categories', $categories);
-
-            array_push($expectedData, (object)$item);
+            array_push($expectedData, $item);
         });
 
         $result = $this->getTestClassInstance()->getFullData();
 
         $this->assertInstanceOf(LengthAwarePaginator::class, $result);
         $this->assertTrue($result->isNotEmpty());
-        $this->assertEquals($expectedData, $result->items());
+        $this->assertEquals($expectedData, collect($result->items())->toArray());
+    }
+
+    /**
+     * @test
+     * @group article
+     * @group article-repository
+     * @throws \Exception
+     */
+    public function it_should_expect_model_not_found_on_by_id(): void
+    {
+        $id = mt_rand(1, 100);
+
+        $this->expectException(ModelNotFoundException::class);
+
+        $this->getTestClassInstance()->getFullDataById($id);
+    }
+
+    /**
+     * @test
+     * @group article
+     * @group article-repository
+     * @throws \Exception
+     */
+    public function it_should_return_full_data_by_id_without_categories(): void
+    {
+        /** @var Article $article */
+        $article = factory(Article::class)->create();
+
+        $expectedData = $article->toArray();
+
+        // Same as: $expectedData['author'] = $article->author->toArray();
+        array_set($expectedData, 'author', $article->author->toArray());
+        array_set($expectedData, 'categories', []);
+
+        $result = $this->getTestClassInstance()->getFullDataById($article->id);
+
+        $this->assertInstanceOf(Article::class, $result);
+        $this->assertEquals($expectedData, $result->toArray());
+    }
+
+    /**
+     * @test
+     * @group article
+     * @group article-repository
+     * @throws \Exception
+     */
+    public function it_should_return_full_data_by_id_with_categories(): void
+    {
+        /** @var Collection|Category[] $categories */
+        $categories = factory(Category::class, 3)->create();
+
+        /** @var Article $article */
+        $article = factory(Article::class)->create();
+        $article->categories()->sync($categories->pluck('id')->all());
+
+        $expectedData = $article->toArray();
+
+        // Same as: $expectedData['author'] = $article->author->toArray();
+        array_set($expectedData, 'author', $article->author->toArray());
+        array_set($expectedData, 'categories', $article->categories->toArray());
+
+        $result = $this->getTestClassInstance()->getFullDataById($article->id);
+
+        $this->assertInstanceOf(Article::class, $result);
+        $this->assertEquals($expectedData, $result->toArray());
     }
 
     /**

@@ -27,6 +27,7 @@ $factory->define(Category::class, function(Faker $faker) {
     return [
         'title' => $title,
         'slug' => Str::slug($title),
+        'reference_category_id' => null,
     ];
 });
 

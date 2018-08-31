@@ -345,77 +345,118 @@ class ArticleServiceTest extends TestCase
         $this->assertEquals(new ArticleDTO($article->id, $article->title, $article->description), $result);
     }
 
+    /**
+     * @test
+     * @group article
+     * @group article-service
+     * @throws \Exception
+     */
+    public function it_should_expect_not_found_exception_by_id_full_data(): void
+    {
+        $id = mt_rand(1, 10);
 
-    // todo: refactor repository function without relations
-//    /**
-//     * @test
-//     * @group article
-//     * @group article-service
-//     * @throws \Exception
-//     */
-//    public function it_should_expect_not_found_exception_by_id_full_data(): void
-//    {
-//        $id = mt_rand(1, 10);
-//
-//        $this->expectException(ModelNotFoundException::class);
-//
-//        $this->getTestClassInstance()->getFullByIdForApi($id);
-//    }
-//
-//    /**
-//     * @test
-//     * @group article
-//     * @group article-service
-//     * @throws \Exception
-//     */
-//    public function it_should_return_full_data_dto_by_id_without_categories(): void
-//    {
-//        /** @var Article $article */
-//        $article = factory(Article::class)->create();
-//
-//        $articleDTO = new ArticleDTO($article->id, $article->title, $article->description);
-//
-//        $author = $article->author;
-//        $authorDTO = (new AuthorDTO())->setAuthorId($author->id)->setFirstName($author->first_name)->setLastName($author->last_name);
-//
-//        $categoriesDTO = new CategoriesDTO();
-//
-//        $articleFullDTO = new ArticleFullDTO($articleDTO, $authorDTO, $categoriesDTO);
-//
-//        $result = $this->getTestClassInstance()->getFullByIdForApi($article->id);
-//
-//        $this->assertEquals($articleFullDTO, $result);
-//    }
-//
-//    /**
-//     * @test
-//     * @group article
-//     * @group article-service
-//     * @throws \Exception
-//     */
-//    public function it_should_return_full_data_dto_by_id_with_categories(): void
-//    {
-//        /** @var Article $article */
-//        $article = factory(Article::class)->create();
-//        $article->categories()->sync(factory(Category::class, 3)->create()->pluck('id')->all());
-//
-//        $articleDTO = new ArticleDTO($article->id, $article->title, $article->description);
-//
-//        $author = $article->author;
-//        $authorDTO = (new AuthorDTO())->setAuthorId($author->id)->setFirstName($author->first_name)->setLastName($author->last_name);
-//
-//        $categoriesDTO = new CategoriesDTO();
-//        $categories = $article->categories;
-//        $categories->each(function(Category $category) use (&$categoriesDTO) {
-//            $categoriesDTO->setCategoryData(new CategoryDTO($category->id, $category->title, $category->slug));
-//        });
-//
-//        $articleFullDTO = new ArticleFullDTO($articleDTO, $authorDTO, $categoriesDTO);
-//
-//        $result = $this->getTestClassInstance()->getFullByIdForApi($article->id);
-//
-//        $this->assertEquals($articleFullDTO, $result);
-//    }
+        $this->initPHPUnitMock(ArticleRepository::class, null, ['getFullDataById'])
+            ->expects($this->once())
+            ->method('getFullDataById')
+            ->with($id)
+            ->willThrowException(new ModelNotFoundException());
+
+        $this->expectException(ModelNotFoundException::class);
+
+        $this->getTestClassInstance()->getFullByIdForApi($id);
+    }
+
+    /**
+     * @test
+     * @group article
+     * @group article-service
+     * @throws \Exception
+     */
+    public function it_should_return_full_data_dto_by_id_without_categories(): void
+    {
+        /** @var Author $author */
+        $author = factory(Author::class)->make([
+            'id' => mt_rand(1, 100),
+        ]);
+
+        /** @var Article $article */
+        $article = factory(Article::class)->make([
+            'id' => mt_rand(1, 100),
+            'author_id' => $author->id
+        ]);
+
+        $article->setAttribute('author', $author);
+        $article->setAttribute('categories', collect());
+
+        $this->initPHPUnitMock(ArticleRepository::class, null, ['getFullDataById'])
+            ->expects($this->once())
+            ->method('getFullDataById')
+            ->with($article->id)
+            ->willReturn($article);
+
+        $articleDTO = new ArticleDTO($article->id, $article->title, $article->description);
+
+        $authorDTO = (new AuthorDTO())->setAuthorId($author->id)->setFirstName($author->first_name)->setLastName($author->last_name);
+
+        $categoriesDTO = new CategoriesDTO();
+
+        $articleFullDTO = new ArticleFullDTO($articleDTO, $authorDTO, $categoriesDTO);
+
+        $result = $this->getTestClassInstance()->getFullByIdForApi($article->id);
+
+        $this->assertEquals($articleFullDTO, $result);
+    }
+
+    /**
+     * @test
+     * @group article
+     * @group article-service
+     * @throws \Exception
+     */
+    public function it_should_return_full_data_dto_by_id_with_categories(): void
+    {
+        /** @var Author $author */
+        $author = factory(Author::class)->make([
+            'id' => mt_rand(1, 100),
+        ]);
+
+        /** @var Collection|Category[] $categories */
+        $categories = factory(Category::class, 3)->make()
+            ->each(function(Category $category, $key) {
+                $category->id = $key + 1;
+            });
+
+        /** @var Article $article */
+        $article = factory(Article::class)->make([
+            'id' => mt_rand(1, 100),
+            'author_id' => $author->id
+        ]);
+
+        $article->setAttribute('author', $author);
+        $article->setAttribute('categories', $categories);
+
+        $this->initPHPUnitMock(ArticleRepository::class, null, ['getFullDataById'])
+            ->expects($this->once())
+            ->method('getFullDataById')
+            ->with($article->id)
+            ->willReturn($article);
+
+        $articleDTO = new ArticleDTO($article->id, $article->title, $article->description);
+
+        $authorDTO = (new AuthorDTO())->setAuthorId($author->id)->setFirstName($author->first_name)->setLastName($author->last_name);
+
+        $categoriesDTO = new CategoriesDTO();
+
+        $categories->each(function(Category $category) use (&$categoriesDTO) {
+            $categoriesDTO->setCategoryData(new CategoryDTO($category->id, $category->title, $category->slug));
+        });
+
+        $articleFullDTO = new ArticleFullDTO($articleDTO, $authorDTO, $categoriesDTO);
+
+        $result = $this->getTestClassInstance()->getFullByIdForApi($article->id);
+
+        $this->assertEquals($articleFullDTO, $result);
+    }
 
     /**
      * @return ArticleService

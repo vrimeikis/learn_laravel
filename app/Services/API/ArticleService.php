@@ -153,8 +153,7 @@ class ArticleService
     public function getFullByIdForApi(int $articleId): ArticleFullDTO
     {
         /** @var Article $article */
-        $article = $this->articleRepository->with(['author', 'categories'])
-            ->findOrFail($articleId);
+        $article = $this->articleRepository->getFullDataById($articleId);
 
         // make ArticleDtTO object
         $articleDTO = new ArticleDTO($article->id, $article->title, $article->description);
