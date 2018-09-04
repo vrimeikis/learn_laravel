@@ -14,13 +14,10 @@
 Auth::routes();
 
 Route::get('/', 'Front\\HomeController@index')->name('home');
-Route::get('category/{slug}', function() {
-    return 'TODO: return articles by category!';
-})->name('front.category.articles');
+Route::get('category/{slug}', 'Front\\CategoryController@showArticles')->name('front.category.articles');
 
-Route::get('article/{slug}', function() {
-    return 'TODO: make article page!';
-})->name('front.article');
+Route::get('articles', 'Front\\ArticleController@index')->name('front.articles');
+Route::get('article/{slug}', 'Front\\ArticleController@show')->name('front.article.slug');
 
 Route::get('contacts', 'Front\\ContactController@index')->name('contacts');
 Route::post('contacts', 'Front\\ContactController@sendMessage');

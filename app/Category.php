@@ -18,9 +18,12 @@ declare(strict_types = 1);
 
 namespace App;
 
+use App\Article;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * Class Category
@@ -32,6 +35,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $title
  * @property string $slug
  * @property int|null $reference_category_id
+ * @property-read Collection|Article[] $articles
  * @method static Builder|Category whereCreatedAt($value)
  * @method static Builder|Category whereId($value)
  * @method static Builder|Category whereReferenceCategoryId($value)
@@ -50,4 +54,12 @@ class Category extends Model
         'slug',
         'reference_category_id'
     ];
+
+    /**
+     * @return BelongsToMany
+     */
+    public function articles(): BelongsToMany
+    {
+        return $this->belongsToMany(Article::class);
+    }
 }
