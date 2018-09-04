@@ -12,8 +12,11 @@ use App\Services\API\CategoryService;
 use App\Services\ClientAPI\ClientArticleService;
 use App\Services\ClientAPI\ClientAuthorService;
 use App\Services\ClientAPI\ClientCategoryService;
+use App\Services\FrontCategoryService;
 use App\Services\UserService;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -26,10 +29,19 @@ class AppServiceProvider extends ServiceProvider
      * Bootstrap any application services.
      *
      * @return void
+     * @throws \Exception
      */
     public function boot(): void
     {
         Schema::defaultStringLength(191);
+
+        if (!Auth::user() && Schema::hasTable('categories')) {
+
+            View::share(
+                'categories',
+                $this->app->make(FrontCategoryService::class)->getList()
+            );
+        }
     }
 
     /**
@@ -56,6 +68,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(ClientAuthorService::class);
         $this->app->singleton(ClientCategoryService::class);
         $this->app->singleton(ClientArticleService::class);
+
+        $this->app->singleton(FrontCategoryService::class);
     }
 
     /**
