@@ -29,6 +29,7 @@
                                 <th>ID</th>
                                 <th>Cover</th>
                                 <th>Title</th>
+                                <th>Type</th>
                                 <th>Slug</th>
                                 <th>Actions</th>
                             </tr>
@@ -42,6 +43,7 @@
                                         @endif
                                     </td>
                                     <td>{{ $article->title }}</td>
+                                    <td>{{ \App\Enum\ArticleTypeEnum::from($article->article_type)->getName() }}</td>
                                     <td>{{ $article->slug }}</td>
                                     <td>
                                         <a class="btn btn-sm btn-info"

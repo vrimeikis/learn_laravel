@@ -4,11 +4,13 @@ declare(strict_types = 1);
 
 namespace App\Http\Requests;
 
+use App\Enum\ArticleTypeEnum;
 use App\Repositories\ArticleRepository;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 /**
  * Class ArticleStoreRequest
@@ -30,6 +32,7 @@ class ArticleStoreRequest extends FormRequest
      * Get the validation rules that apply to the request.
      *
      * @return array
+     * @throws \ReflectionException
      */
     public function rules(): array
     {
@@ -43,7 +46,19 @@ class ArticleStoreRequest extends FormRequest
                 'array',
                 'exists:categories,id',
             ],
+            'article_type' => [
+                'required',
+                Rule::in(ArticleTypeEnum::enum()),
+            ]
         ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getArticleType(): string
+    {
+        return $this->input('article_type');
     }
 
     /**

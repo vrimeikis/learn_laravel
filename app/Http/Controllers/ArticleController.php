@@ -82,7 +82,9 @@ class ArticleController extends Controller
         /** @var Collection $authors */
         $authors = $this->authorRepository->all();
 
-        return view('article.create', compact('authors', 'categories'));
+        $articleTypes = ArticleTypeEnum::options();
+
+        return view('article.create', compact('authors', 'categories', 'articleTypes'));
     }
 
     /**
@@ -100,6 +102,7 @@ class ArticleController extends Controller
             'description' => $request->getDescription(),
             'author_id' => $request->getAuthorId(),
             'slug' => $request->getSlug(),
+            'article_type' => $request->getArticleType(),
         ];
 
         /** @var Article $article */
@@ -160,6 +163,7 @@ class ArticleController extends Controller
             'description' => $request->getDescription(),
             'author_id' => $request->getAuthorId(),
             'slug' => $request->getSlug(),
+            'article_type' => $request->getArticleType(),
         ];
 
         if ($request->getCover()) {

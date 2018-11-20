@@ -25,7 +25,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property int|null $author_id
  * @property-read Author|null $author
  * @property int|null $reference_article_id
+ * @property string $article_type
  * @property-read Collection|Category[] $categories
+ * @method static Builder|Article whereArticleType($value)
  * @method static Builder|Article whereAuthorId($value)
  * @method static Builder|Article whereCover($value)
  * @method static Builder|Article whereCreatedAt($value)
@@ -49,6 +51,7 @@ class Article extends Model
         'slug',
         'author_id',
         'reference_article_id',
+        'article_type',
     ];
 
 

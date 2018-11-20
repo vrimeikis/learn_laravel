@@ -28,6 +28,7 @@ class ArticleUpdateRequest extends ArticleStoreRequest
      * Get the validation rules that apply to the request.
      *
      * @return array
+     * @throws \ReflectionException
      */
     public function rules(): array
     {

@@ -48,6 +48,21 @@
                             </div>
 
                             <div class="form-group">
+                                <label for="article_type">{{ __('Article type') }}</label>
+                                <select class="form-control" id="article_type" name="article_type">
+                                    @foreach($articleTypes as $articleType)
+                                        <option value="{{ $articleType['id'] }}" {{ $articleType['id'] == old('article_type') ? 'selected="selected"' : '' }}>
+                                            {{ $articleType['name'] }} | {{ $articleType['description'] }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @if($errors->has('article_type'))
+                                    <div class="alert-danger">{{ $errors->first('article_type') }}</div>
+                                @endif
+                            </div>
+
+
+                            <div class="form-group">
                                 <label for="author_id">{{ __('Author') }}:</label>
 
                                 <select id="author_id" name="author_id" class="form-control">

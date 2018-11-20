@@ -36,6 +36,10 @@
                                 <td>{{ $article->description }}</td>
                             </tr>
                             <tr>
+                                <td>{{ __('Article type') }}:</td>
+                                <td>{{ \App\Enum\ArticleTypeEnum::from($article->article_type)->getName() }}</td>
+                            </tr>
+                            <tr>
                                 <td>{{ __('Author') }}:</td>
                                 <td>{{ $article->author->first_name }} {{ $article->author->last_name }}</td>
                             </tr>
