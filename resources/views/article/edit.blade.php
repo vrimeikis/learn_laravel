@@ -17,7 +17,8 @@
                             </div>
                         @endif
 
-                        <form action="{{ route('article.update', [$article->id]) }}" method="post" enctype="multipart/form-data">
+                        <form action="{{ route('article.update', [$article->id]) }}" method="post"
+                              enctype="multipart/form-data">
 
                             {{ method_field('put') }}
 
@@ -46,11 +47,19 @@
 
                             <div class="form-group">
                                 <label for="description">{{ __('Description') }}:</label>
-                                <textarea id="description" class="form-control"
-                                          name="description">{{ old('description', $article->description) }}</textarea>
+                                <textarea id="description" class="form-control" name="description">{{ old('description', $article->description) }}</textarea>
                                 @if($errors->has('description'))
                                     <div class="alert-danger">{{ $errors->first('description') }}</div>
                                 @endif
+                            </div>
+
+                            <div class="form-group">
+                                <label for="article_type">{{ __('Article type') }}</label>
+                                <select class="form-control" id="article_type" name="article_name">
+                                    @foreach($articleTypes as $articleType)
+                                        <option value="{{ $articleType['id'] }}">{{ $articleType['name'] }} | {{ $articleType['description'] }}</option>
+                                    @endforeach
+                                </select>
                             </div>
 
                             <div class="form-group">

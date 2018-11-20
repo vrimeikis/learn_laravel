@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace App\Http\Controllers;
 
 use App\Article;
+use App\Enum\ArticleTypeEnum;
 use App\Http\Requests\ArticleStoreRequest;
 use App\Http\Requests\ArticleUpdateRequest;
 use App\Repositories\ArticleRepository;
@@ -138,8 +139,9 @@ class ArticleController extends Controller
 
         $authors = $this->authorRepository->all();
         $categories = $this->categoryRepository->all();
+        $articleTypes = ArticleTypeEnum::options();
 
-        return view('article.edit', compact('article', 'authors', 'categories'));
+        return view('article.edit', compact('article', 'authors', 'categories', 'articleTypes'));
     }
 
     /**
