@@ -23,6 +23,7 @@
                                 <th>ID</th>
                                 <th>First name</th>
                                 <th>Last name</th>
+                                <th>Location type</th>
                                 <th>Actions</th>
                             </tr>
 
@@ -31,6 +32,7 @@
                                     <td>{{ $author->id }}</td>
                                     <td>{{ $author->first_name }}</td>
                                     <td>{{ $author->last_name }}</td>
+                                    <td>{{ \App\Enum\AuthorLocationTypeEnum::from($author->location_type)->getName() }}</td>
                                     <td>
                                         <a class="btn btn-sm btn-success" href="{{ route('author.edit', [$author->id]) }}">{{ __('Edit') }}</a>
                                     </td>

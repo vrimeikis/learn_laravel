@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace App\Http\Controllers;
 
+use App\Enum\AuthorLocationTypeEnum;
 use App\Http\Requests\AuthorRequest;
 use App\Repositories\AuthorRepository;
 use Illuminate\Http\RedirectResponse;
@@ -44,10 +45,13 @@ class AuthorController extends Controller
      * Show the form for creating a new resource.
      *
      * @return View
+     * @throws \ReflectionException
      */
     public function create(): View
     {
-        return view('author.create');
+        $locationTypes = AuthorLocationTypeEnum::options();
+
+        return view('author.create', compact('locationTypes'));
     }
 
     /**
@@ -62,6 +66,7 @@ class AuthorController extends Controller
         $this->authorRepository->create([
             'first_name' => $request->getFirstName(),
             'last_name' => $request->getLastName(),
+            'location_type' => $request->getLocationType(),
         ]);
 
         return redirect()
@@ -79,8 +84,9 @@ class AuthorController extends Controller
     public function edit(int $authorId): View
     {
         $author = $this->authorRepository->find($authorId);
+        $locationTypes = AuthorLocationTypeEnum::options();
 
-        return view('author.edit', compact('author'));
+        return view('author.edit', compact('author', 'locationTypes'));
     }
 
     /**
@@ -96,6 +102,7 @@ class AuthorController extends Controller
         $this->authorRepository->update([
             'first_name' => $request->getFirstName(),
             'last_name' => $request->getLastName(),
+            'location_type' => $request->getLocationType(),
         ], $authorId);
 
         return redirect()

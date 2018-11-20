@@ -42,6 +42,20 @@
                             </div>
 
                             <div class="form-group">
+                                <label for="location_type">{{ __('Location type') }}</label>
+                                <select id="location_type" name="location_type" class="form-control">
+                                    @foreach($locationTypes as $locationType)
+                                        <option value="{{ $locationType['id'] }}" {{ $locationType['id'] == old('$locationType', $author->location_type) ? 'selected="selected"' : '' }}>
+                                            {{ $locationType['name'] }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @if($errors->has('location_type'))
+                                    <div class="alert-danger">{{ $errors->first('location_type') }}</div>
+                                @endif
+                            </div>
+
+                            <div class="form-group">
                                 <input class="btn btn-success" type="submit" value="{{ __('Save') }}">
                             </div>
 

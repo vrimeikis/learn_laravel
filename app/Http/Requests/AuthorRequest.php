@@ -4,7 +4,9 @@ declare(strict_types = 1);
 
 namespace App\Http\Requests;
 
+use App\Enum\AuthorLocationTypeEnum;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 /**
  * Class AuthorRequest
@@ -26,12 +28,17 @@ class AuthorRequest extends FormRequest
      * Get the validation rules that apply to the request.
      *
      * @return array
+     * @throws \ReflectionException
      */
     public function rules(): array
     {
         return [
             'first_name' => 'required|max:30',
             'last_name' => 'required|max:50',
+            'location_type' => [
+                'required',
+                Rule::in(AuthorLocationTypeEnum::enum()),
+            ],
         ];
     }
 
@@ -49,5 +56,13 @@ class AuthorRequest extends FormRequest
     public function getLastName(): string
     {
         return $this->input('last_name');
+    }
+
+    /**
+     * @return string
+     */
+    public function getLocationType(): string
+    {
+        return $this->input('location_type');
     }
 }
